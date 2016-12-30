@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.example.andrii.labsontabs.ChooseActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:text="Option 1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/option_1_radio"
+                android:layout_marginStart="34dp"
+                android:layout_marginTop="107dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:checked="true"
+                android:onClick="onRadioClick"
+                />
+
+            <RadioButton
+                android:text="Option 2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/option_1_radio"
+                android:layout_alignStart="@+id/option_1_radio"
+                android:layout_marginTop="25dp"
+                android:id="@+id/option_2_radio"
+                android:onClick="onRadioClick" />
+
+            <RadioButton
+                android:text="Option 3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/option_2_radio"
+                android:layout_alignStart="@+id/option_2_radio"
+                android:layout_marginTop="33dp"
+                android:id="@+id/option_3_radio"
+                android:onClick="onRadioClick" />
+
+        </RadioGroup>
+
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>
