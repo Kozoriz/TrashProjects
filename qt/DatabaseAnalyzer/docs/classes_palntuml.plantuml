@@ -1,0 +1,73 @@
+@startuml
+
+set namespaceSeparator ::
+
+class hight_level::DatabaseReporter {
+	+ string GetReport()
+}
+
+class hight_level::DatabaseAnalyzer {
+	+ bool FilterData(map<column_name, filter_value>);
+	+ data_types::Table GetFilteredData()
+
+	- data_types::Table table_
+	- data_types::Table current_filtered_table_
+
+	- low_level::DatabaseWrapper db_wrapper_
+}
+
+class low_level::DatabaseWrapper {
+	+ ImportData(string filename)
+	+ ExportData(string filename)
+
+	- data_types::Table& table_
+}
+
+namespace file_system <<Database>>	 {
+	class Database << (D,#0000FF) >> {
+
+	}
+}
+
+class data_types::Table {
+	+ const data_types::TableRow& operator[](int) const 
+	+ void ChangeRowData(int row_num, data_types::TableRow new_row_data)
+	+ size_t size() const
+
+	- vector<data_types::TableRow> rows_
+}
+
+class data_types::TableRow {
+	+ cosnt data_types::PrimitiveType& operator[](string key) cosnt 
+	+ void SetData(string key, data_types::PrimitiveType value)
+
+	- map<String, data_types::PrimitiveType> row_data_
+}
+
+interface data_types::PrimitiveType {
+			+ DataType::eType GetDataType() const 
+{abstract}	+ string asString() const = 0
+{abstract}	+ float asNum() const = 0
+
+	- DataType::eType data_type_ 
+}
+
+
+
+hight_level::DatabaseReporter --o hight_level::DatabaseAnalyzer
+
+hight_level::DatabaseAnalyzer --* data_types::Table
+hight_level::DatabaseAnalyzer --* low_level::DatabaseWrapper
+
+low_level::DatabaseWrapper --o data_types::Table
+low_level::DatabaseWrapper ..> file_system::Database : uses
+
+data_types::Table --* data_types::TableRow
+
+data_types::TableRow --* data_types::PrimitiveType
+
+data_types::String --|> data_types::PrimitiveType
+data_types::Number --|> data_types::PrimitiveType
+
+
+@enduml
