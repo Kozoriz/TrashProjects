@@ -12,7 +12,7 @@ class hight_level::DatabaseAnalyzer {
 
 	- data_types::Table table_
 	- data_types::Table current_filtered_table_
-
+	- string database_file_name_
 	- low_level::DatabaseWrapper db_wrapper_
 }
 
