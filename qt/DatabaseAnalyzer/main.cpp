@@ -1,11 +1,17 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
+#include <QApplication>
+#include <QtWidgets/QWidget>
+
+#include "logger.h"
+#include "mainwindow.h"
 
 int main(int argc, char* argv[]) {
-  QGuiApplication app(argc, argv);
+  LOG_MESSAGE("START");
+  QApplication app(argc, argv);
 
-  QQmlApplicationEngine engine;
-  engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+  QWidget* widget = new MainWindow;
+  widget->show();
+
+  app.installEventFilter(widget);
 
   return app.exec();
 }

@@ -8,10 +8,13 @@
 class DatabaseReporter {
  public:
   DatabaseReporter(const DatabaseAnalyzer& data_processor);
-  std::string GenerateReport() const;
+  void GenerateReport() const;
 
  private:
   const DatabaseAnalyzer& data_processor_;
+  void GenerateTxtReport();
+  void GenerateDocReport();
+  void GeneratePdfReport();
 };
 
 #endif  // DATABASEREPORTER_H

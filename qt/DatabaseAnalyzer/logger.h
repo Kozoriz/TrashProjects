@@ -4,7 +4,6 @@
 #include <QDateTime>
 #include <QFile>
 #include <QObject>
-#include <QPlainTextEdit>
 #include <QTextStream>
 
 class Logger : public QObject {
@@ -15,22 +14,19 @@ class Logger : public QObject {
   ~Logger();
 
  private:
-  explicit Logger(QObject* parent,
-                  QString fileName,
-                  QPlainTextEdit* editor = 0);
+  explicit Logger(QObject* parent, QString fileName);
 
   QFile* file;
-  QPlainTextEdit* m_editor;
   bool m_showDate;
 
-  Logger* instance_ = NULL;
+  static Logger* instance_;
 
  signals:
 
  public slots:
-  void write(const QString& value);
+  void write(const std::string& value);
 };
 
-#define LOG_MESSAGE(parent, message) Logger::instance().write(message);
+#define LOG_MESSAGE(message) Logger::instance(NULL)->write(message);
 
 #endif  // LOGGER_H

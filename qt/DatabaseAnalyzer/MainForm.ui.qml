@@ -3,6 +3,7 @@ import QtQuick.Controls 2.0
 
 Rectangle {
     property alias mouseArea: mouseArea
+    property alias import_button: import_button
 
 
     MouseArea {
@@ -24,7 +25,7 @@ Rectangle {
                 y: 0
                 width: 81
                 height: 40
-                text: qsTr("Import")
+                text: "Import"
             }
 
             ToolButton {

@@ -1,15 +1,64 @@
 #include "databaseanalyzer.h"
 
-DatabaseAnalyzer::DatabaseAnalyzer(const std::string& database_file_name)
-    : database_file_name_(database_file_name)
-    , table_()
-    , current_filtered_table_()
-    , db_wrapper_(table_) {
-  db_wrapper_.ImportData(database_file_name_);
+#include "logger.h"
+
+namespace {
+Table::Rows& operator+=(Table::Rows& a, const Table::Rows& b) {
+  for (size_t i = 0; i < b.size(); ++i) {
+    a.push_back(b[i]);
+  }
+  return a;
+}
 }
 
-void DatabaseAnalyzer::FilterData(DatabaseAnalyzer::Filter filter) {}
+DatabaseAnalyzer::DatabaseAnalyzer()
+    : table_(), current_filtered_table_(), db_wrapper_(table_) {
+  LOG_MESSAGE("DatabaseAnalyzer::DatabaseAnalyzer");
+}
+
+void DatabaseAnalyzer::ImportData(const std::string& db_name) {
+  db_wrapper_.ImportData(db_name);
+  current_filtered_table_ = table_;
+}
+
+void DatabaseAnalyzer::FilterData(Filter filter) {
+  LOG_MESSAGE("DatabaseAnalyzer::FilterData");
+  current_filtered_table_.Clear();
+  current_filtered_table_ = table_;
+
+  for (auto& it : filter) {
+    LOG_MESSAGE("DatabaseAnalyzer::FilterData::filtering : (" + it.first +
+                " : " + it.second + ")");
+    current_filtered_table_ =
+        Table(current_filtered_table_.GetRowsWithColValue(it.first, it.second));
+  }
+}
+
+void DatabaseAnalyzer::OnCellChanged(const int row,
+                                     const int column,
+                                     const std::string& data) {
+  LOG_MESSAGE("DatabaseAnalyzer::OnCellChanged");
+  table_.UpdateCellValue(row, column, data);
+}
+
+void DatabaseAnalyzer::FilterErrorData() {
+  LOG_MESSAGE("DatabaseAnalyzer::FilterErrorData");
+  current_filtered_table_.Clear();
+
+  std::vector<std::string> keys = table_[0].Keys();
+  Table::Rows filtered_rows;
+  for (size_t i = 0; i < keys.size(); ++i) {
+    filtered_rows += table_.GetRowsWithColValue(keys[i], "");
+  }
+  current_filtered_table_ = Table(filtered_rows);
+}
 
 const Table& DatabaseAnalyzer::GetFilteredData() const {
+  LOG_MESSAGE("DatabaseAnalyzer::GetFilteredData");
   return current_filtered_table_;
+}
+
+const Table& DatabaseAnalyzer::GetData() const {
+  LOG_MESSAGE("DatabaseAnalyzer::GetData");
+  return table_;
 }

@@ -3,7 +3,15 @@
 DatabaseReporter::DatabaseReporter(const DatabaseAnalyzer& data_processor)
     : data_processor_(data_processor) {}
 
-std::string DatabaseReporter::GenerateReport() const {
-  data_processor_.GetFilteredData();
-  return std::string("");
+void DatabaseReporter::GenerateReport() const {
+  GenerateTxtReport();
+  GenerateDocReport();
+  GeneratePdfReport();
+  return;
 }
+
+void DatabaseReporter::GenerateTxtReport() {}
+
+void DatabaseReporter::GenerateDocReport() {}
+
+void DatabaseReporter::GeneratePdfReport() {}

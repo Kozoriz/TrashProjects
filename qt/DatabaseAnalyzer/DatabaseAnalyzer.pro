@@ -1,7 +1,7 @@
 TEMPLATE = app
 
-QT += qml quick
-CONFIG += c++11
+QT += gui widgets
+LIBS += -lsqlite3
 
 SOURCES += main.cpp \
     hight_level/databasereporter.cpp \
@@ -9,12 +9,14 @@ SOURCES += main.cpp \
     low_level/databasewrapper.cpp \
     data_types/table.cpp \
     data_types/tablerow.cpp \
-    data_types/primitivetype.cpp \
     data_types/string.cpp \
     data_types/number.cpp \
-    logger.cpp
+    logger.cpp \
+    low_level/sql_query.cc \
+    mainwindow.cpp \
+    filterdialog.cpp
 
-RESOURCES += qml.qrc
+RESOURCES +=
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -31,4 +33,10 @@ HEADERS += \
     data_types/primitivetype.h \
     data_types/string.h \
     data_types/number.h \
-    logger.h
+    logger.h \
+    low_level/sql_query.h \
+    mainwindow.h \
+    filterdialog.h
+
+FORMS += mainwindow.ui \
+    filterdialog.ui
