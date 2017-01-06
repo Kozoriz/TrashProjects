@@ -5,6 +5,20 @@
 namespace queries {
 const std::string kSelectAllData = "SELECT * from storage";
 const std::string kSelectAllColumns = "PRAGMA table_info(storage)";
+const std::string kUpdateTable = "UPDATE `storage` SET ";
+
+std::string GenerateUpdateRowQuery(const TableRow& row) {
+  std::string query = kUpdateTable;
+  const std::vector<std::string> keys = row.Keys();
+  for (size_t i = 0; i < keys.size(); ++i) {
+    if ("id" != keys[i]) {
+      query += "'" + keys[i] + "' = '" + row[keys[i]]->asString() + "', ";
+    }
+  }
+  query.erase(query.find_last_of(','));
+  query += " WHERE id = " + std::to_string(atoi(row["id"]->asString().c_str()));
+  return query;
+}
 }
 
 DatabaseWrapper::DatabaseWrapper(Table& table) : table_(table), conn_(NULL) {
@@ -50,7 +64,21 @@ void DatabaseWrapper::ImportData(const std::string& db_name) {
   }
 }
 
-void DatabaseWrapper::ExportData() {}
+void DatabaseWrapper::ExportData() {
+  if (Open()) {
+    for (size_t i = 0; i < table_.Size(); ++i) {
+      const std::string query = queries::GenerateUpdateRowQuery(table_[i]);
+      LOG_MESSAGE("DatabaseWrapper::ExportData::" + query);
+      if (!Exec(query)) {
+        LOG_MESSAGE("DatabaseWrapper::ExecError" + std::to_string(error_));
+        Close();
+        return;
+      }
+    }
+    LOG_MESSAGE("DatabaseWrapper::Export::Complete");
+    Close();
+  }
+}
 
 sqlite3* DatabaseWrapper::conn() const {
   return conn_;

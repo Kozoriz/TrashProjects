@@ -3,7 +3,7 @@
 
 Number::Number(const std::string& initial_value)
     : data(atof(initial_value.c_str())) {
-  LOG_MESSAGE("Number::Number::i_v=(" + initial_value + ")");
+  //  LOG_MESSAGE("Number::Number::i_v=(" + initial_value + ")");
 }
 
 Number::~Number() {}

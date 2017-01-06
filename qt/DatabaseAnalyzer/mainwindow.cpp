@@ -39,10 +39,10 @@ MainWindow::MainWindow(QWidget* parent)
   connect(ui->actionFilter, SIGNAL(triggered()), this, SLOT(Filter()));
   connect(ui->actionGenerate_Repor, SIGNAL(triggered()), this, SLOT(Report()));
   connect(ui->actionShowErrors, SIGNAL(triggered()), this, SLOT(ShowErrors()));
-  //  connect(ui->tableWidget,
-  //          SIGNAL(cellChanged(int, int)),
-  //          this,
-  //          SLOT(OnCellChanged(int, int)));
+  connect(ui->tableWidget,
+          SIGNAL(cellChanged(int, int)),
+          this,
+          SLOT(OnCellChanged(int, int)));
 
   ui->actionFilter->setEnabled(false);
   ui->actionSave->setEnabled(false);
@@ -70,6 +70,7 @@ void MainWindow::Import() {
 
 void MainWindow::Export() {
   LOG_MESSAGE("MainWindow::Export");
+  analyzer_.ExportData();
 }
 void MainWindow::Filter() {
   LOG_MESSAGE("MainWindow::Filter");
@@ -80,13 +81,18 @@ void MainWindow::Filter() {
 void MainWindow::Report() {
   LOG_MESSAGE("MainWindow::Report");
 
-  DatabaseReporter reporter;
+  DatabaseReporter reporter(analyzer_);
   reporter.GenerateReport();
 }
 
 void MainWindow::FillUITable(QTableWidget* ui_table, const Table& data_table) {
   LOG_MESSAGE("MainWindow::FillUITable");
   ui_table->clear();
+
+  if (0 == data_table.Size()) {
+    LOG_MESSAGE("MainWindow::FillUITable::EmptyTable");
+    return;
+  }
 
   const std::vector<std::string> keys = data_table[0].Keys();
   const size_t col_count = keys.size();
@@ -117,6 +123,7 @@ void MainWindow::FillUITable(QTableWidget* ui_table, const Table& data_table) {
   ui->actionFilter->setEnabled(true);
   ui->actionGenerate_Repor->setEnabled(true);
   ui->actionShowErrors->setEnabled(true);
+  ui->actionSave->setEnabled(true);
 }
 
 void MainWindow::OnFilterGenerated(const QMap<QString, QString>& q_filter) {
@@ -138,7 +145,6 @@ void MainWindow::ShowErrors() {
 }
 
 void MainWindow::OnCellChanged(int row, int column) {
-  LOG_MESSAGE("MainWindow::OnCellChanged");
   QString text = ui->tableWidget->item(row, column)->text();
   analyzer_.OnCellChanged(row, column, text.toStdString());
 }

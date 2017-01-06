@@ -16,6 +16,7 @@ class TableRow {
   std::vector<std::string> Keys() const;
 
   void UpdateCellValue(const int column, const std::string& new_data);
+  std::string asString() const;
 
  private:
   typedef std::map<std::string, PrimitiveType*> RowData;

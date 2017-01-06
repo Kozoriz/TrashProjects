@@ -21,6 +21,7 @@ class DatabaseAnalyzer {
 
   DatabaseAnalyzer();
   void ImportData(const std::string& db_name);
+  void ExportData();
 
   void FilterData(Filter filter);
   void FilterErrorData();

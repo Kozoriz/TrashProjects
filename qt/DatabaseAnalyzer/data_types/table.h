@@ -22,9 +22,13 @@ class Table {
   void UpdateCellValue(const int row,
                        const int column,
                        const std::string& data);
+  void UpdateRowById(const int id, const TableRow& row);
+
+  std::string asString() const;
 
  private:
   Rows rows_;
+  int FindRowPosById(const int id) const;
 };
 
 #endif  // TABLE_H

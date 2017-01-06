@@ -21,6 +21,10 @@ void DatabaseAnalyzer::ImportData(const std::string& db_name) {
   current_filtered_table_ = table_;
 }
 
+void DatabaseAnalyzer::ExportData() {
+  db_wrapper_.ExportData();
+}
+
 void DatabaseAnalyzer::FilterData(Filter filter) {
   LOG_MESSAGE("DatabaseAnalyzer::FilterData");
   current_filtered_table_.Clear();
@@ -37,8 +41,12 @@ void DatabaseAnalyzer::FilterData(Filter filter) {
 void DatabaseAnalyzer::OnCellChanged(const int row,
                                      const int column,
                                      const std::string& data) {
-  LOG_MESSAGE("DatabaseAnalyzer::OnCellChanged");
-  table_.UpdateCellValue(row, column, data);
+  TableRow changed_row = current_filtered_table_[row];
+  const int id = atoi(changed_row["id"]->asString().c_str());
+
+  changed_row.UpdateCellValue(column, data);
+
+  table_.UpdateRowById(id, changed_row);
 }
 
 void DatabaseAnalyzer::FilterErrorData() {

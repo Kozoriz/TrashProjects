@@ -44,6 +44,15 @@ void TableRow::UpdateCellValue(const int column, const std::string& new_data) {
   } else {
     data = new String(new_data);
   }
-
   it->second = data;
+}
+
+std::string TableRow::asString() const {
+  std::string result = "|";
+  std::vector<std::string> keys = Keys();
+  for (size_t i = 0; i < keys.size(); ++i) {
+    result += "| " + data_.find(keys[i])->second->asString() + " ";
+  }
+  result += "||";
+  return result;
 }

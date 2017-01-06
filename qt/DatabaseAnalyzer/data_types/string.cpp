@@ -2,7 +2,7 @@
 #include "logger.h"
 
 String::String(std::string initial_data) : data(initial_data) {
-  LOG_MESSAGE("String::String::i_v=(" + initial_data + ")");
+  //  LOG_MESSAGE("String::String::i_v=(" + initial_data + ")");
 }
 
 String::~String() {}

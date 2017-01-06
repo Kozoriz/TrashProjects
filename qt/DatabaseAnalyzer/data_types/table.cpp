@@ -36,3 +36,28 @@ void Table::UpdateCellValue(const int row,
                             const std::string& data) {
   rows_[row].UpdateCellValue(column, data);
 }
+
+void Table::UpdateRowById(const int id, const TableRow& row) {
+  const int position = FindRowPosById(id);
+  if (-1 == position) {
+    return;
+  }
+  rows_[position] = row;
+}
+
+std::string Table::asString() const {
+  std::string result;
+  for (size_t i = 0; i < rows_.size(); ++i) {
+    result += rows_[i].asString() + "\n";
+  }
+  return result;
+}
+
+int Table::FindRowPosById(const int id) const {
+  for (size_t i = 0; i < rows_.size(); ++i) {
+    if (id == atoi(rows_[i]["id"]->asString().c_str())) {
+      return i;
+    }
+  }
+  return -1;
+}

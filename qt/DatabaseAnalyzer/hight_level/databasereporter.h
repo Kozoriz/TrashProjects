@@ -12,9 +12,9 @@ class DatabaseReporter {
 
  private:
   const DatabaseAnalyzer& data_processor_;
-  void GenerateTxtReport();
-  void GenerateDocReport();
-  void GeneratePdfReport();
+  void GenerateTxtReport() const;
+  void GenerateDocReport() const;
+  void GeneratePdfReport() const;
 };
 
 #endif  // DATABASEREPORTER_H
