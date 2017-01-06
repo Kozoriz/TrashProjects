@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-int main(/*int argc, char *argv[]*/)
+int main(int argc, char *argv[])
 {
-//  QCoreApplication a(argc, argv);
+  QApplication a(argc, argv);
   std::cout << "asdasdasd";
-//  return a.exec();
+  return a.exec();
 }
