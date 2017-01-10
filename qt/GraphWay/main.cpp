@@ -1,10 +1,16 @@
-#include <QCoreApplication>
 
-#include <iostream>
+#include <QApplication>
+#include <QtWidgets/QWidget>
 
-int main(int argc, char *argv[])
-{
-  QApplication a(argc, argv);
-  std::cout << "asdasdasd";
-  return a.exec();
+#include "logger.h"
+#include "mainwindow.h"
+
+int main(int argc, char* argv[]) {
+  LOG_MESSAGE("START");
+  QApplication app(argc, argv);
+
+  QWidget* widget = new MainWindow;
+  widget->showNormal();
+
+  return app.exec();
 }
