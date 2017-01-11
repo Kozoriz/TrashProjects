@@ -1,2 +1,29 @@
 @startuml
+scale max 1024*768
+
+:User: as U 
+
+rectangle ServerSide {
+:Server Side: as SS
+
+rectangle UI {
+	(Save data in readable format) as SDRF
+	
+	SDRF <|-- (Save as SCV)
+	SDRF <|-- (Save as sqlite)
+
+	U --> (Start scannign process)
+	U --> (Stop scanning process)
+	U --> SDRF
+}
+}
+
+rectangle DroneSide {
+	SS --> (SendCommands)
+	SS --> (ReceiveData)
+}
+
+
+
+
 @enduml
