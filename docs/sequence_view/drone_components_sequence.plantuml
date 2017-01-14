@@ -1,0 +1,32 @@
+@startuml
+
+[-> ServerMessageHandler : "incoming message"
+ServerMessageHandler --> ServerMessageHandler : "recognize message type"
+
+alt start scanning
+	ServerMessageHandler --> ServerMessageHandler : "trigger scanning cond_var"
+	Scanner --> Scanner : "handle triggering" 
+	loop 180*180
+		Scanner --> SensorAdapter : getData
+		Scanner --> ServoAdapter : getData
+	 	group if axelerometer.exists
+	 		Scanner --> AxelerometerAdapter : getData
+ 		end
+ 		Scanner --> Scanner : makeMessage
+ 		Scanner --> ServerMessageHandler : putMessageForSending
+
+ 		Scanner --> ServoAdapter : changePosition
+	end
+else move
+	ServerMessageHandler --> Mover : put message to moving queue
+	Mover --> Mover : handle
+	alt rotate
+		Mover --> Mover : Rotate
+		Mover --> EngineAdapter : spinWhellsVersoVersa
+	else move forward
+		Mover --> Mover : MoveForward
+		Mover --> EngineAdapter : spinBothWhells
+	end
+end
+
+@enduml

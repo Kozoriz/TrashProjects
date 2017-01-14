@@ -1,0 +1,27 @@
+@startuml
+scale max 1024*768
+
+[->DroneMessageHandler : "receive message"
+
+DroneMessageHandler --> SnapshotProcessor : addMessageToQueue
+SnapshotProcessor --> SnapshotProcessor : handle
+alt sensors data package	
+	SnapshotProcessor --> SnapshotProcessor : convertRawDataToPoint
+else end sensor data package
+	SnapshotProcessor --> SnapshotProcessor : finalyzeShanpshot
+	SnapshotProcessor --> MapAssembler : OnSnapshotGenerated
+	MapAssembler --> MapAssembler : processSnapshot
+	MapAssembler --> MapDetalzationAnalyzer : OnMapUpdated
+	MapDetalzationAnalyzer --> MapDetalzationAnalyzer : recalculateDetalizationPositions
+	MapDetalzationAnalyzer --> Guide : OnPositionsUpdated
+	Guide --> DroneMover : getCurrentPosition
+	Guide --> Guide : findNearestDetalizationPoint
+	Guide --> Guide : generateWay
+	Guide --> DroneMover : addCheckpointsToMoveQueue
+	DroneMover --> DroneMover : handle
+	DroneMover --> DroneMover : gotCheckpoint
+	DroneMover --> DroneMover : generateDroneCommands
+	DroneMover --> DroneMessageHandler : putMessageToQueueForSend
+end
+
+@enduml

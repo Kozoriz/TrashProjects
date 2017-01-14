@@ -1,0 +1,15 @@
+Drone side : 
+/**
+* ServerMessageHandler (main thread)- connects to server TCP port and receive/send messages
+* @member move_message_queue_ - mqueqe which contains move commands for Mover component
+* @member sersor_data_message_queue_ - mqueue which contains data of sensors, will be sent to server 
+* @member scanning_cond_variable_ - if received message triggers this variable scanner will start scanning process
+**/
+/**
+* Scanner (separated thread)- using Adapters gets data and makes messages for server, 
+* 	and puts it to ServerMessageHandler::sersor_data_message_queue_
+* @member server_message_handler_ - reference of ServerMessageHandler for adding messages to sending queue
+* @member sensor_adapter_ - pointer to adapters for getting data
+* @member servo_adapter_ - pointer to adapters for getting data and changing servo positions
+* @member axelerometer_adapter_ (if exists) - pointer to adapters for getting data
+**/

@@ -1,2 +1,46 @@
 @startuml
+scale max 1024*768
+
+cloud {
+	interface "ServerTcpPort" as STP
+}
+
+node ServerSide {
+	[DroneMessageHandler] as DMH
+	DMH .right.> STP : send/receive messages
+
+	[SnapshotProcessor] as SP 
+	[MapAssembler] as MA
+	[MapDetalizationAnalyzer] as MDA
+	[Guide] as G
+	[DroneMover] as DM
+
+	SP -up-o DMH
+	SP --o MA
+	MA --o MDA
+	MDA --o G
+	G --o DM	
+	DM -up-o DMH
+}
+
+node DroneSide {
+	[Scanner] as S
+	[SensorAdapter] as SenA
+	[ServoAdapter] as SerA
+	[AxelerometerAdapter] as AxeA
+	S ..> SenA : use
+	S ..> SerA : use
+	Note bottom of AxeA : Only if included/supported
+	S ..> AxeA : use
+
+	[Mover] as M 
+	[EngineAdapter] as EngA
+	M ..> EngA : use
+
+	[ServerMessageHandler] as SMH
+	S -up-o SMH
+	M -up-o SMH
+	SMH ..> STP : send/receive messages
+}
+
 @enduml
