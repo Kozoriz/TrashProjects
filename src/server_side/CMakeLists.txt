@@ -8,7 +8,12 @@ set(SOURCES
 )
 
 set(LIBRARIES
-
+    DroneMessageHandler
+    DroneMover
+    Guide
+    MapAssembler
+    MapDetalizationAnalyzer
+    SnapshotProcessor
 )
 
 add_executable(${ClientExecutable} ${SOURCES})
