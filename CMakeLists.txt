@@ -4,13 +4,14 @@ set (PROJECT EnvironmentScanner)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+
 option(BUILD_TESTS "Build Unit Tests" ON)
 option(AXELEROMETER_INCLUDED "If axelerometer connected to drone" OFF)
 
 set(3RD_PARTY_PATH ${CMAKE_SOURCE_DIR}/src/3rd_party)
 set(UTILS_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/src/utils/include)
 
-#add_subdirectory(src/3rd_party)
+add_subdirectory(src/3rd_party)
 add_subdirectory(src/utils)
 add_subdirectory(src/droid_side)
 add_subdirectory(src/server_side)
