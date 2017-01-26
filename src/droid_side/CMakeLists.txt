@@ -36,7 +36,8 @@ add_executable(${ClientExecutable} ${SOURCES})
 target_link_libraries (${ClientExecutable} ${LIBRARIES})
 
 if(BUILD_TESTS)
-	add_subdirectory(unit_tests)
+    set(UNIT_TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/unit_tests)
+    add_subdirectory(${UNIT_TESTS_DIR})
 endif()
 
 
