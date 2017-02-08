@@ -8,6 +8,11 @@ macro(create_test NAME SOURCES LIBS)
     add_test(NAME ${NAME} COMMAND ${NAME} --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/)
 endmacro(create_test)
 
+include_directories(
+    include
+    ${UTILS_MOCK_INCLUDE_PATH}
+    )
+
 add_subdirectory(server_message_handler)
 add_subdirectory(scanner)
 add_subdirectory(mover)
