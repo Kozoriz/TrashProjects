@@ -10,7 +10,7 @@ typedef utils::Queue<MoveMessage> MoveMessageQueue;
 
 class Mover : public utils::threads::ThreadRunnable {
  public:
-  virtual void OnMoveMessageReceived(const MoveMessage* message) = 0;
+  virtual void OnMoveMessageReceived(const MoveMessage& message) = 0;
 
  protected:
   MoveMessageQueue move_queue_;

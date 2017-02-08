@@ -13,17 +13,14 @@ mover::TankTrackMover::~TankTrackMover() {
   finalizyng_ = true;
 }
 
-void mover::TankTrackMover::OnMoveMessageReceived(const MoveMessage* message) {
+void mover::TankTrackMover::OnMoveMessageReceived(const MoveMessage& message) {
   utils::synchronization::AutoLock auto_lock(move_queue_lock_);
-  if (NULL != message) {
-    move_queue_.push(*message);
-  }
+  move_queue_.push(message);
 }
 
 void mover::TankTrackMover::Run() {
   while (!finalizyng_) {
     MoveMessage current_action;
-    current_action.move_type_ = MoveType::INVALID_ENUM;
     {
       utils::synchronization::AutoLock auto_lock_(move_queue_lock_);
       if (!move_queue_.empty()) {
@@ -31,13 +28,13 @@ void mover::TankTrackMover::Run() {
         move_queue_.pop();
       }
     }
-    switch (current_action.move_type_) {
+    switch (current_action.move_type()) {
       case MoveType::MOVE_FORWARD: {
-        Move(current_action.value_);
+        Move(current_action.value());
         break;
       }
       case MoveType::ROTATE: {
-        Rotate(current_action.value_);
+        Rotate(current_action.value());
         break;
       }
       default:

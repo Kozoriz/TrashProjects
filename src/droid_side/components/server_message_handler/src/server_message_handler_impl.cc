@@ -2,28 +2,36 @@
 #include "utils/synchronization/auto_lock.h"
 
 #include "scanner/sensor_data_message.h"
+#include "utils/tcp_socket.h"
 
-server_message_handler::ServerMessageHandlerImpl::ServerMessageHandlerImpl(
-    mover::Mover& mover, scanner::Scanner& scanner)
-    : mover_(mover), scanner_(scanner) {}
+namespace server_message_handler {
 
-void server_message_handler::ServerMessageHandlerImpl::SendMessageToServer(
-    const server_message_handler::Message* message) {
+ServerMessageHandlerImpl::ServerMessageHandlerImpl(mover::Mover& mover,
+                                                   scanner::Scanner& scanner)
+    : mover_(mover), scanner_(scanner), server_socket_(nullptr) {
+  // TODO use profiler
+  server_socket_ = new utils::TcpSocket("192.168.0.1", 10999);
+}
+
+ServerMessageHandlerImpl::~ServerMessageHandlerImpl() {
+  if (server_socket_) {
+    delete server_socket_;
+  }
+}
+
+void ServerMessageHandlerImpl::SendMessageToServer(const Message* message) {
   utils::synchronization::AutoLock auto_lock(messages_to_server_lock_);
   messages_to_server_.push(message);
 }
 
-void server_message_handler::ServerMessageHandlerImpl::Run() {
+void ServerMessageHandlerImpl::Run() {
   while (true) {
-    /*
-     * TODO
-     * Check socket for messages
-     * receive messages, sort by type
-     */
-    Message* message = new Message;  // get this message from socket
-    switch (message->type_) {
+    // Receiving from server
+    const utils::ByteArray& raw_data = server_socket_->Receive();
+    Message message(raw_data);
+    switch (message.type()) {
       case MessageType::MOVE: {
-        mover_.OnMoveMessageReceived(static_cast<mover::MoveMessage*>(message));
+        mover_.OnMoveMessageReceived(mover::MoveMessage(raw_data));
         break;
       }
       case MessageType::START_SCAN: {
@@ -37,16 +45,19 @@ void server_message_handler::ServerMessageHandlerImpl::Run() {
         // LOG ERROR
         break;
     }
-
-    while (!messages_to_server_.empty()) {
-      const scanner::SensorDataMessage* message =
-          static_cast<const scanner::SensorDataMessage*>(
-              messages_to_server_.front());
-      messages_to_server_.pop();
-      /* TODO
-       * send @message via socket
-       */
-      delete message;
+    {
+      utils::synchronization::AutoLock auto_lock(messages_to_server_lock_);
+      while (!messages_to_server_.empty()) {
+        const scanner::SensorDataMessage* message =
+            static_cast<const scanner::SensorDataMessage*>(
+                messages_to_server_.front());
+        messages_to_server_.pop();
+        // Sending to server
+        server_socket_->Send(message->ToRawData());
+        delete message;
+      }
     }
   }
 }
+
+}  // namespace server_message_handler

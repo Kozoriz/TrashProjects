@@ -10,7 +10,7 @@ class TankTrackMover : public Mover {
   TankTrackMover(const engine_adapter::EngineAdapter& left,
                  const engine_adapter::EngineAdapter& right);
   ~TankTrackMover();
-  void OnMoveMessageReceived(const MoveMessage* message) override;
+  void OnMoveMessageReceived(const MoveMessage& message) override;
   void Run() override;
 
  private:

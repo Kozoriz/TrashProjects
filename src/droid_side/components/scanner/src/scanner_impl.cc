@@ -1,6 +1,8 @@
 #include "scanner/scanner_impl.h"
 #include "server_message_handler/server_message_handler.h"
 
+#include "utils/synchronization/auto_lock.h"
+
 namespace {
 utils::positions::Incline operator+(const utils::positions::Incline& a,
                                     const utils::positions::Incline& b) {
@@ -26,6 +28,7 @@ scanner::ScannerImpl::ScannerImpl(
 }
 
 scanner::ScannerImpl::~ScannerImpl() {
+  utils::synchronization::AutoLock auto_lock(finalyzing_lock_);
   finalyzing_ = true;
 }
 
@@ -35,6 +38,7 @@ void scanner::ScannerImpl::OnScanningTriggered() {
 
 void scanner::ScannerImpl::Run() {
   while (!finalyzing_) {
+    utils::synchronization::AutoLock auto_lock(finalyzing_lock_);
     if (is_scanning_allowed_) {
       // TODO use profiler for max x/y
       for (current_position_.alpha_; current_position_.alpha_ <= 179;
@@ -60,17 +64,12 @@ void scanner::ScannerImpl::SetServerMessageHandler(
 
 scanner::SensorDataMessage scanner::ScannerImpl::MakeServerMessage(
     utils::UInt distance, utils::positions::Incline axelerometer_data) {
-  SensorDataMessage message;
-  message.type_ = server_message_handler::MessageType::SENSOR_DATA;
-  message.distance_ = distance;
-  message.sensor_position_ = current_position_ + axelerometer_data;
-  return message;
+  return SensorDataMessage(distance, current_position_ + axelerometer_data);
 }
 
 scanner::SensorDataMessage scanner::ScannerImpl::MakeFinalMessage() {
-  SensorDataMessage message;
-  message.final_message_ = true;
-  return message;
+  utils::positions::Incline empty_incline;
+  return SensorDataMessage(0, empty_incline, true);
 }
 
 void scanner::ScannerImpl::SendDataToServer(

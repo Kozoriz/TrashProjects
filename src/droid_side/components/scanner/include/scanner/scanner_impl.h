@@ -6,6 +6,7 @@
 #include "sensor_adapter/sensor_adapter.h"
 #include "servo_adapter/servo_adapter.h"
 #include "utils/synchronization/atomic.h"
+#include "utils/synchronization/lock.h"
 
 namespace server_message_handler {
 class ServerMessageHandler;
@@ -26,7 +27,7 @@ class ScannerImpl : public Scanner {
       server_message_handler::ServerMessageHandler* message_handler);
 
  private:
-  scanner::SensorDataMessage MakeServerMessage(
+  SensorDataMessage MakeServerMessage(
       utils::UInt distance, utils::positions::Incline axelerometer_data);
   scanner::SensorDataMessage MakeFinalMessage();
   void SendDataToServer(const SensorDataMessage& message) const;
@@ -49,5 +50,7 @@ class ScannerImpl : public Scanner {
   utils::synchronization::AtomicBool finalyzing_;
 
   utils::positions::Incline current_position_;
+
+  utils::synchronization::Lock finalyzing_lock_;
 };
 }
