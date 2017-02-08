@@ -4,8 +4,7 @@ namespace drone_message_handler {
 
 class MockDroneMessageHandler : public DroneMessageHandler {
  public:
-  MOCK_METHOD0(foo,
-      void());
+  MOCK_METHOD0(foo, void());
 };
 
 }  // namespace drone_message_handler

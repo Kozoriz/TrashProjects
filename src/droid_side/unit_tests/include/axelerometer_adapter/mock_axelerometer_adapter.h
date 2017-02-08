@@ -4,8 +4,7 @@ namespace axelerometer_adapter {
 
 class MockAxelerometerAdapter : public AxelerometerAdapter {
  public:
-  MOCK_CONST_METHOD0(GetData,
-      utils::positions::Incline());
+  MOCK_CONST_METHOD0(GetData, utils::positions::Incline());
 };
 
 }  // namespace axelerometer_adapter

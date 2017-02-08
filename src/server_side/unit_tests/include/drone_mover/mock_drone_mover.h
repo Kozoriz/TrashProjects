@@ -4,8 +4,7 @@ namespace drone_mover {
 
 class MockDroneMover : public DroneMover {
  public:
-  MOCK_METHOD0(foo,
-      void());
+  MOCK_METHOD0(foo, void());
 };
 
 }  // namespace drone_mover
