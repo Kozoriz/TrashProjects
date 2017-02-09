@@ -5,8 +5,8 @@
 #include "scanner/sensor_data_message.h"
 #include "sensor_adapter/sensor_adapter.h"
 #include "servo_adapter/servo_adapter.h"
-#include "utils/synchronization/atomic.h"
-#include "utils/synchronization/lock.h"
+#include "utils/threads/synchronization/atomic.h"
+#include "utils/threads/synchronization/lock.h"
 
 namespace server_message_handler {
 class ServerMessageHandler;

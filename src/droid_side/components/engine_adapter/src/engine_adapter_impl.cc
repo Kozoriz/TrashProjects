@@ -1,6 +1,6 @@
 #include "engine_adapter/engine_adapter_impl.h"
 #include "utils/logger.h"
-#include "utils/string.h"
+#include "utils/containers/string.h"
 
 void engine_adapter::EngineAdapterImpl::SpinForward(
     const utils::UInt milliseconds) const {

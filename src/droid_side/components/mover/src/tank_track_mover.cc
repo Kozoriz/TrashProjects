@@ -1,6 +1,6 @@
 #include "mover/tank_track_mover.h"
 #include "utils/logger.h"
-#include "utils/synchronization/auto_lock.h"
+#include "utils/threads/synchronization/auto_lock.h"
 
 mover::TankTrackMover::TankTrackMover(
     const engine_adapter::EngineAdapter& left,

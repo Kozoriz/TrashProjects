@@ -11,6 +11,7 @@ endmacro(create_test)
 include_directories(
     include
     ${UTILS_MOCK_INCLUDE_PATH}
+    ${GTEST_INCLUDE_DIR}
     )
 
 add_subdirectory(drone_message_handler)

@@ -1,7 +1,7 @@
 #include "scanner/scanner_impl.h"
 #include "server_message_handler/server_message_handler.h"
 
-#include "utils/synchronization/auto_lock.h"
+#include "utils/threads/synchronization/auto_lock.h"
 
 namespace {
 utils::positions::Incline operator+(const utils::positions::Incline& a,

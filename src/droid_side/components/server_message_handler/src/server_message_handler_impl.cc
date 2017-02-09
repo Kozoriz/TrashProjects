@@ -1,8 +1,8 @@
 #include "server_message_handler/server_message_handler_impl.h"
-#include "utils/synchronization/auto_lock.h"
+#include "utils/threads/synchronization/auto_lock.h"
 
 #include "scanner/sensor_data_message.h"
-#include "utils/tcp_socket.h"
+#include "utils/network/tcp_socket.h"
 
 namespace server_message_handler {
 

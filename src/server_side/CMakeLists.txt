@@ -1,6 +1,11 @@
 
 add_subdirectory(components)
 
+include_directories(
+    components/include
+    ${UTILS_INCLUDE_PATH}
+    )
+
 set(ClientExecutable ${PROJECT}_Server)
 
 set(SOURCES

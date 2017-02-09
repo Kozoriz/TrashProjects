@@ -2,7 +2,7 @@
 
 #include "engine_adapter/engine_adapter.h"
 #include "mover/mover.h"
-#include "utils/synchronization/atomic.h"
+#include "utils/threads/synchronization/atomic.h"
 
 namespace mover {
 class TankTrackMover : public Mover {

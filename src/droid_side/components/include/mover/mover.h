@@ -1,8 +1,8 @@
 #pragma once
 
 #include "mover/move_message.h"
-#include "utils/queue.h"
-#include "utils/synchronization/lock.h"
+#include "utils/containers/queue.h"
+#include "utils/threads/synchronization/lock.h"
 #include "utils/threads/thread_runnable.h"
 
 namespace mover {

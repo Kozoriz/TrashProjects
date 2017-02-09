@@ -3,11 +3,11 @@
 #include "mover/mover.h"
 #include "scanner/scanner.h"
 #include "scanner/sensor_data_message.h"
-#include "utils/queue.h"
-#include "utils/socket.h"
-#include "utils/synchronization/lock.h"
+#include "utils/containers/queue.h"
+#include "utils/network/socket.h"
+#include "utils/threads/synchronization/lock.h"
 
-#include "utils/vector.h"
+#include "utils/containers/vector.h"
 
 namespace server_message_handler {
 class ServerMessageHandlerImpl : public ServerMessageHandler {
