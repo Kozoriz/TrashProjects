@@ -1,5 +1,7 @@
 #pragma once
 
+#include <thread>
+
 #include "utils/threads/thread_runnable.h"
 
 namespace utils {
@@ -12,6 +14,7 @@ class Thread {
 
  private:
   ThreadRunnable& runnable_;
+  std::thread std_thread_;
 };
 }
 }

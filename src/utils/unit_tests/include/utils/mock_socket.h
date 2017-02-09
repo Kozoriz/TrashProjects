@@ -1,5 +1,6 @@
 #pragma once
-#include "utils/socket.h"
+#include "utils/network/socket.h"
+#include "gmock/gmock.h"
 
 namespace utils {
 

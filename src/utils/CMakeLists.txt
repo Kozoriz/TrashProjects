@@ -3,8 +3,12 @@
 include_directories(
 ${3RD_PARTY_PATH}
 include
+${GTEST_INCLUDE_DIR}
 )
-file(GLOB SOURCES src/*.cc src/threads/*.cc src/synchronization/*.cc)
+file(GLOB SOURCES 
+	src/*.cc 
+	src/*/*.cc 
+	src/*/*/*.cc)
 
 set(LIBRARIES
 

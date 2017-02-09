@@ -1,7 +1,7 @@
 #pragma once
-#include "utils/synchronization/lock.h"
-#include "utils/synchronization/conditional_variable.h"
-#include "utils/synchronization/auto_lock.h"
+#include "utils/threads/synchronization/lock.h"
+#include "utils/threads/synchronization/conditional_variable.h"
+#include "utils/threads/synchronization/auto_lock.h"
 #include "utils/numbers.h"
 
 namespace utils {

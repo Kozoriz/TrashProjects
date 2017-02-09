@@ -1,7 +1,7 @@
 #pragma once
 
-#include "utils/socket.h"
-#include "utils/string.h"
+#include "utils/network/socket.h"
+#include "utils/containers/string.h"
 
 namespace utils {
 class TcpSocket : public Socket {

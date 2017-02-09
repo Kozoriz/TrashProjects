@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/synchronization/lock.h"
+#include "utils/threads/synchronization/lock.h"
 
 namespace utils {
 namespace synchronization {

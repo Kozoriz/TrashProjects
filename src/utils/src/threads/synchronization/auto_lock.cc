@@ -1,4 +1,4 @@
-#include "utils/synchronization/auto_lock.h"
+#include "utils/threads/synchronization/auto_lock.h"
 
 utils::synchronization::AutoLock::AutoLock(Lock& lock) : lock_(lock) {
   lock_.Acquire();

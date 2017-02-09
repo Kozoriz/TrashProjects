@@ -1,5 +1,5 @@
 
-#include "utils/tcp_socket.h"
+#include "utils/network/tcp_socket.h"
 
 namespace utils {
 TcpSocket::TcpSocket(const utils::String& address, const UInt16 port)
