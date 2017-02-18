@@ -8,6 +8,7 @@ class MockSocket : public SocketClient {
  public:
   MOCK_METHOD1(Send, void(const ByteArray& message));
   MOCK_METHOD0(Receive, const utils::ByteArray&());
+  MOCK_METHOD0(Init, void());
 };
 
 }  // namespace utils

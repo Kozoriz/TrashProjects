@@ -29,15 +29,15 @@ void LifeCycle::InitComponents() {
   sensor_ = new sensor_adapter::LidarLite3Adapter();
   x_servo_ = new servo_adapter::ServoAdapterImpl();
   y_servo_ = new servo_adapter::ServoAdapterImpl();
-  scanner_ =
-      new scanner::ScannerImpl(*sensor_, *x_servo_, *y_servo_, *axelerometer_);
+  scanner_ = new scanner::ScannerImpl(
+      *sensor_, *x_servo_, *y_servo_, *axelerometer_, *settings_);
 
   left_engine_ = new engine_adapter::EngineAdapterImpl();
   right_engine_ = new engine_adapter::EngineAdapterImpl();
   mover_ = new mover::TankTrackMover(*left_engine_, *right_engine_, *settings_);
 
-  message_handler_ =
-      new server_message_handler::ServerMessageHandlerImpl(*mover_, *scanner_);
+  message_handler_ = new server_message_handler::ServerMessageHandlerImpl(
+      *mover_, *scanner_, *settings_);
 }
 
 void LifeCycle::DeinitComponents() {

@@ -17,12 +17,14 @@ scanner::ScannerImpl::ScannerImpl(
     const sensor_adapter::SensorAdapter& sensor_adapter,
     const servo_adapter::ServoAdapter& x_servo_adapter,
     const servo_adapter::ServoAdapter& y_servo_adapter,
-    const axelerometer_adapter::AxelerometerAdapter& axelerometer_adapter)
+    const axelerometer_adapter::AxelerometerAdapter& axelerometer_adapter,
+    const utils::Profile& settings)
     : sensor_(sensor_adapter)
     , x_rotator_(x_servo_adapter)
     , y_rotator_(y_servo_adapter)
     , axelerometer_adapter_(axelerometer_adapter)
-    , finalyzing_(false) {
+    , finalyzing_(false)
+    , settings_(settings) {
   current_position_.alpha_ = 0;
   current_position_.beta_ = 0;
 }
@@ -40,10 +42,15 @@ void scanner::ScannerImpl::Run() {
   while (!finalyzing_) {
     utils::synchronization::AutoLock auto_lock(finalyzing_lock_);
     if (is_scanning_allowed_) {
-      // TODO use profiler for max x/y
-      for (current_position_.alpha_ = 0; current_position_.alpha_ <= 179;
+      const utils::UInt max_alpha = settings_.rotator_max_horyzontal();
+      const utils::UInt max_beta = settings_.rotator_max_vertical();
+      const utils::UInt min_alpha = settings_.rotator_min_horyzontal();
+      const utils::UInt min_beta = settings_.rotator_min_vertical();
+      for (current_position_.alpha_ = min_alpha;
+           current_position_.alpha_ <= max_alpha;
            ++current_position_.alpha_) {
-        for (current_position_.beta_ = 0; current_position_.beta_ <= 180;
+        for (current_position_.beta_ = min_beta;
+             current_position_.beta_ <= max_beta;
              ++current_position_.beta_) {
           utils::UInt distance = sensor_.GetSensorData();
           utils::positions::Incline axelerometer_data =

@@ -1,6 +1,6 @@
 #pragma once
 #include "drone_message_handler/drone_message_handler.h"
-#include "utils/network/socket.h"
+#include "utils/network/socket_client.h"
 
 namespace drone_message_handler {
 class DroneMessageHandlerImpl : public DroneMessageHandler {

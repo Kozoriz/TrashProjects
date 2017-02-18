@@ -9,6 +9,7 @@
 #include "scanner/sensor_data_message.h"
 
 #include "utils/async_waiter.h"
+#include "utils/mock_profile.h"
 #include "utils/threads/thread.h"
 
 namespace test {
@@ -24,7 +25,8 @@ class ScannerImplTest : public ::testing::Test {
       : scanner_(mock_sensor_adapter_,
                  mock_horizontal_servo_adapter_,
                  mock_vertical_servo_adapter_,
-                 mock_axelerometer_adapter_)
+                 mock_axelerometer_adapter_,
+                 mock_settings_)
       , scanner_thread_(scanner_) {
     scanner_.SetServerMessageHandler(&mock_server_message_handler_);
   }
@@ -36,6 +38,7 @@ class ScannerImplTest : public ::testing::Test {
   servo_adapter::MockServoAdapter mock_horizontal_servo_adapter_;
   servo_adapter::MockServoAdapter mock_vertical_servo_adapter_;
   axelerometer_adapter::MockAxelerometerAdapter mock_axelerometer_adapter_;
+  utils::MockProfile mock_settings_;
 
   scanner::ScannerImpl scanner_;
   utils::threads::Thread scanner_thread_;
@@ -50,19 +53,26 @@ MATCHER_P(ExpectFinalMessage, is_final, "") {
 }
 
 TEST_F(ScannerImplTest, Run_FullCycle_CorrectCountOfCalls) {
-  // TODO get from profile
-  const utils::UInt max_alpha = 179u + 1;
-  const utils::UInt max_beta = 180u + 1;
+  const utils::UInt max_alpha = 10;
+  const utils::UInt max_beta = 10;
+  const utils::UInt expected_calls_count = (max_alpha + 1) * (max_beta + 1);
+
+  EXPECT_CALL(mock_settings_, rotator_max_horyzontal())
+      .WillOnce(Return(max_alpha));
+  EXPECT_CALL(mock_settings_, rotator_max_vertical())
+      .WillOnce(Return(max_beta));
+  EXPECT_CALL(mock_settings_, rotator_min_horyzontal()).WillOnce(Return(0));
+  EXPECT_CALL(mock_settings_, rotator_min_vertical()).WillOnce(Return(0));
 
   utils::TestAsyncWaiter waiter;
 
   EXPECT_CALL(mock_sensor_adapter_, GetSensorData())
-      .Times(max_alpha * max_beta);
+      .Times(expected_calls_count);
   EXPECT_CALL(mock_axelerometer_adapter_, GetData())
-      .Times(max_alpha * max_beta);
+      .Times(expected_calls_count);
   EXPECT_CALL(mock_server_message_handler_,
               SendMessageToServer(ExpectFinalMessage(false)))
-      .Times(max_alpha * max_beta);
+      .Times(expected_calls_count);
   EXPECT_CALL(mock_server_message_handler_,
               SendMessageToServer(ExpectFinalMessage(true)))
       .WillOnce(utils::NotifyTestAsyncWaiter(&waiter));

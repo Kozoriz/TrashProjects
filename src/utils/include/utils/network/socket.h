@@ -8,5 +8,6 @@ class Socket {
  public:
   virtual void Send(const ByteArray& message) = 0;
   virtual const ByteArray& Receive() = 0;
+  virtual void Init() = 0;
 };
 }  // namespace utils

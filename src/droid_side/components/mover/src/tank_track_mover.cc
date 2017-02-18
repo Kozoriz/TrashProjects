@@ -67,11 +67,8 @@ void mover::TankTrackMover::Join() {
 }
 
 void mover::TankTrackMover::Move(const utils::Int centimeters) const {
-  /**
-   * @brief centimeters_per_second - TODO get data from profile
-   */
-  utils::Float centimeters_per_second = 3.f;
-  utils::Int milliseconds = centimeters / centimeters_per_second;
+  utils::Int milliseconds =
+      centimeters / settings_.engine_centimeters_per_second();
   if (milliseconds < 0) {
     left_track_adapter_.SpinBack(-milliseconds);
     right_track_adapter_.SpinBack(-milliseconds);
@@ -82,12 +79,7 @@ void mover::TankTrackMover::Move(const utils::Int centimeters) const {
 }
 
 void mover::TankTrackMover::Rotate(const utils::Int angle) const {
-  /**
-   * @brief angle_per_second - TODO get data from profile
-   */
-  utils::Float angle_per_second = 3.f;
-  utils::Int milliseconds = angle / angle_per_second;
-
+  utils::Int milliseconds = angle / settings_.engine_angle_per_second();
   if (milliseconds < 0) {
     // Rotate left
     left_track_adapter_.SpinBack(-milliseconds);

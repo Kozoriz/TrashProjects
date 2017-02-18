@@ -6,11 +6,16 @@
 
 namespace server_message_handler {
 
-ServerMessageHandlerImpl::ServerMessageHandlerImpl(mover::Mover& mover,
-                                                   scanner::Scanner& scanner)
-    : mover_(mover), scanner_(scanner), server_socket_connection_(nullptr) {
-  // TODO use profiler
-  server_socket_connection_ = new utils::TcpSocketClient("192.168.0.1", 10999);
+ServerMessageHandlerImpl::ServerMessageHandlerImpl(
+    mover::Mover& mover,
+    scanner::Scanner& scanner,
+    const utils::Profile& settings)
+    : mover_(mover)
+    , scanner_(scanner)
+    , server_socket_connection_(nullptr)
+    , settings_(settings) {
+  server_socket_connection_ = new utils::TcpSocketClient(
+      settings_.server_address(), settings_.server_port());
 }
 
 ServerMessageHandlerImpl::~ServerMessageHandlerImpl() {
@@ -25,6 +30,7 @@ void ServerMessageHandlerImpl::SendMessageToServer(const Message* message) {
 }
 
 void ServerMessageHandlerImpl::Run() {
+  server_socket_connection_->Init();
   while (true) {
     // Receiving from server
     const utils::ByteArray& raw_data = server_socket_connection_->Receive();

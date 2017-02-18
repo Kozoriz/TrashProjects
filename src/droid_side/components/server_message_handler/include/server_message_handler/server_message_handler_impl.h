@@ -8,11 +8,14 @@
 #include "utils/threads/synchronization/lock.h"
 
 #include "utils/containers/vector.h"
+#include "utils/profile.h"
 
 namespace server_message_handler {
 class ServerMessageHandlerImpl : public ServerMessageHandler {
  public:
-  ServerMessageHandlerImpl(mover::Mover& mover, scanner::Scanner& scanner);
+  ServerMessageHandlerImpl(mover::Mover& mover,
+                           scanner::Scanner& scanner,
+                           const utils::Profile& settings);
   virtual ~ServerMessageHandlerImpl();
   void SendMessageToServer(const Message* message) override;
   void Run() override;
@@ -26,6 +29,7 @@ class ServerMessageHandlerImpl : public ServerMessageHandler {
   scanner::Scanner& scanner_;
   // TODO investigate testing without using of pointer
   utils::SocketClient* server_socket_connection_;
+  const utils::Profile& settings_;
 
 #if defined(BUILD_TESTS)
  public:

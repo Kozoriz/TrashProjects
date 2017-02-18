@@ -16,11 +16,10 @@ using ::testing::Return;
 namespace {
 const utils::Int negative_move_value = -10;
 const utils::Int positive_move_value = 10;
-// TODO use profiler
 const utils::Float centimeters_per_second = 3.f;
 const utils::Float angles_per_second = 3.f;
 
-const utils::UInt default_waiting_timeout_ms = 300000;
+const utils::UInt default_waiting_timeout_ms = 1000;
 }
 
 class MoverImplTest : public ::testing::Test {
@@ -30,6 +29,10 @@ class MoverImplTest : public ::testing::Test {
     EXPECT_CALL(right_ea_, SetAdapterSynchronizationBarrier(_));
     EXPECT_CALL(mock_settings_, mover_adapters_count())
         .WillRepeatedly(Return(0u));
+    EXPECT_CALL(mock_settings_, engine_centimeters_per_second())
+        .WillRepeatedly(Return(centimeters_per_second));
+    EXPECT_CALL(mock_settings_, engine_angle_per_second())
+        .WillRepeatedly(Return(angles_per_second));
 
     track_mover_ =
         new mover::TankTrackMover(left_ea_, right_ea_, mock_settings_);

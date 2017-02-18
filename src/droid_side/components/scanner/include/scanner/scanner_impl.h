@@ -5,6 +5,7 @@
 #include "scanner/sensor_data_message.h"
 #include "sensor_adapter/sensor_adapter.h"
 #include "servo_adapter/servo_adapter.h"
+#include "utils/profile.h"
 #include "utils/threads/synchronization/atomic.h"
 #include "utils/threads/synchronization/lock.h"
 
@@ -19,7 +20,8 @@ class ScannerImpl : public Scanner {
       const sensor_adapter::SensorAdapter& sensor_adapter,
       const servo_adapter::ServoAdapter& x_servo_adapter,
       const servo_adapter::ServoAdapter& y_servo_adapter,
-      const axelerometer_adapter::AxelerometerAdapter& axelerometer_adapter);
+      const axelerometer_adapter::AxelerometerAdapter& axelerometer_adapter,
+      const utils::Profile& settings);
   ~ScannerImpl();
   void OnScanningTriggered() override;
   void Run() override;
@@ -53,5 +55,7 @@ class ScannerImpl : public Scanner {
   utils::positions::Incline current_position_;
 
   utils::synchronization::Lock finalyzing_lock_;
+
+  const utils::Profile& settings_;
 };
 }
