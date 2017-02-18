@@ -8,6 +8,9 @@
 
 #include "scanner/sensor_data_message.h"
 
+#include "utils/async_waiter.h"
+#include "utils/threads/thread.h"
+
 namespace test {
 namespace scanner_test {
 static utils::UInt counter_ = 0;
@@ -21,7 +24,8 @@ class ScannerImplTest : public ::testing::Test {
       : scanner_(mock_sensor_adapter_,
                  mock_horizontal_servo_adapter_,
                  mock_vertical_servo_adapter_,
-                 mock_axelerometer_adapter_) {
+                 mock_axelerometer_adapter_)
+      , scanner_thread_(scanner_) {
     scanner_.SetServerMessageHandler(&mock_server_message_handler_);
   }
   ~ScannerImplTest() {}
@@ -34,6 +38,7 @@ class ScannerImplTest : public ::testing::Test {
   axelerometer_adapter::MockAxelerometerAdapter mock_axelerometer_adapter_;
 
   scanner::ScannerImpl scanner_;
+  utils::threads::Thread scanner_thread_;
 };
 
 MATCHER_P(ExpectFinalMessage, is_final, "") {
@@ -41,15 +46,15 @@ MATCHER_P(ExpectFinalMessage, is_final, "") {
       static_cast<const scanner::SensorDataMessage*>(arg);
   const utils::Byte first_byte = message_ptr->ToRawData()[0];
   const bool final = static_cast<bool>((first_byte & 0x10) >> 4);
-  std::cout << ++counter_ << std::endl;
   return is_final == final;
 }
 
-// TODO investigate how to go out of inf loop (maybe 2 threads testing)
-TEST_F(ScannerImplTest, DISABLED_Run_FullCycle_CorrectCountOfCalls) {
+TEST_F(ScannerImplTest, Run_FullCycle_CorrectCountOfCalls) {
   // TODO get from profile
-  const utils::UInt max_alpha = 179u;
-  const utils::UInt max_beta = 180u;
+  const utils::UInt max_alpha = 179u + 1;
+  const utils::UInt max_beta = 180u + 1;
+
+  utils::TestAsyncWaiter waiter;
 
   EXPECT_CALL(mock_sensor_adapter_, GetSensorData())
       .Times(max_alpha * max_beta);
@@ -59,10 +64,13 @@ TEST_F(ScannerImplTest, DISABLED_Run_FullCycle_CorrectCountOfCalls) {
               SendMessageToServer(ExpectFinalMessage(false)))
       .Times(max_alpha * max_beta);
   EXPECT_CALL(mock_server_message_handler_,
-              SendMessageToServer(ExpectFinalMessage(true)));
+              SendMessageToServer(ExpectFinalMessage(true)))
+      .WillOnce(utils::NotifyTestAsyncWaiter(&waiter));
 
   scanner_.OnScanningTriggered();
-  scanner_.Run();
+  scanner_thread_.StartThread();
+  waiter.WaitFor(1, 3000);
+  scanner_thread_.JoinThread();
 }
 }
 }
