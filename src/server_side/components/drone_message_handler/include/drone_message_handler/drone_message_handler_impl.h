@@ -7,12 +7,12 @@ class DroneMessageHandlerImpl : public DroneMessageHandler {
  public:
   DroneMessageHandlerImpl();
   ~DroneMessageHandlerImpl();
-  void Run() override;
-  void SendMessageToDroid() override;
+//  void Run() override;
+//  void SendMessageToDroid() override;
 #if defined(BUILD_TESTS)
-  void set_socket(utils::Socket* socket);
+  void set_socket(utils::SocketClient* socket);
 #endif
-  private:
-    utils::Socket* socket_;
+ private:
+  utils::SocketClient* socket_;
 };
 }

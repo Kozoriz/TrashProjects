@@ -10,8 +10,16 @@
 
 #include "server_message_handler/server_message_handler_impl.h"
 
+#include "utils/containers/string.h"
+#include "utils/profile_impl.h"
+
+CREATE_LOGGER("Main")
+
 void LifeCycle::InitComponents() {
-  LOG_TRACE(logger::IN);
+  LOG_AUTO_TRACE();
+
+  const utils::String file_name = "client_side_settings.ini";
+  settings_ = new utils::ProfileImpl(file_name);
 
 #ifdef AXELEROMETER_INCLUDED
 #error "Need to implement another impl"
@@ -26,16 +34,14 @@ void LifeCycle::InitComponents() {
 
   left_engine_ = new engine_adapter::EngineAdapterImpl();
   right_engine_ = new engine_adapter::EngineAdapterImpl();
-  mover_ = new mover::TankTrackMover(*left_engine_, *right_engine_);
+  mover_ = new mover::TankTrackMover(*left_engine_, *right_engine_, *settings_);
 
   message_handler_ =
       new server_message_handler::ServerMessageHandlerImpl(*mover_, *scanner_);
-
-  LOG_TRACE(logger::OUT);
 }
 
 void LifeCycle::DeinitComponents() {
-  LOG_TRACE(logger::IN);
+  LOG_AUTO_TRACE();
   delete scanner_;
   delete axelerometer_;
   delete x_servo_;
@@ -46,21 +52,21 @@ void LifeCycle::DeinitComponents() {
   delete left_engine_;
   delete right_engine_;
 
-  LOG_TRACE(logger::OUT);
+  delete message_handler_;
+
+  delete settings_;
 }
 
 void LifeCycle::StartThreads() {
-  LOG_TRACE(logger::IN);
+  LOG_AUTO_TRACE();
   mover_thread_ = new utils::threads::Thread(*mover_);
   scanner_thread_ = new utils::threads::Thread(*scanner_);
 
   mover_thread_->StartThread();
   scanner_thread_->StartThread();
-  LOG_TRACE(logger::OUT);
 }
 
 int LifeCycle::ListenToServer() {
-  LOG_TRACE(logger::IN);
+  LOG_AUTO_TRACE();
   message_handler_->Run();
-  LOG_TRACE(logger::OUT);
 }

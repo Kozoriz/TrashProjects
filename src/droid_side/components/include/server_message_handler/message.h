@@ -1,7 +1,7 @@
 #pragma once
 
-#include "utils/structures/position.h"
 #include "utils/containers/vector.h"
+#include "utils/structures/position.h"
 
 namespace server_message_handler {
 /**

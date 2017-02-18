@@ -2,9 +2,11 @@
 
 #include "life_cycle.h"
 
+CREATE_LOGGER("Main")
+
 int main(int argc, char** argv) {
-  INIT_LOGGER("logger_config.ini");
-  LOG_TRACE(logger::IN);
+  logger::LoggerAutoPtr logger();
+  LOG_AUTO_TRACE();
 
   LifeCycle life_cycle;
   // Components creatting
@@ -19,6 +21,5 @@ int main(int argc, char** argv) {
   // Destruct components
   life_cycle.DeinitComponents();
 
-  LOG_TRACE(logger::OUT);
   return 0;
 }

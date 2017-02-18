@@ -2,15 +2,24 @@
 #include "utils/logger.h"
 #include "utils/threads/synchronization/auto_lock.h"
 
-mover::TankTrackMover::TankTrackMover(
-    const engine_adapter::EngineAdapter& left,
-    const engine_adapter::EngineAdapter& right)
+mover::TankTrackMover::TankTrackMover(engine_adapter::EngineAdapter& left,
+                                      engine_adapter::EngineAdapter& right,
+                                      const utils::Profile& settings)
     : left_track_adapter_(left)
     , right_track_adapter_(right)
-    , finalizyng_(false) {}
+    , settings_(settings)
+    , left_track_thread_(left_track_adapter_)
+    , right_track_thread_(right_track_adapter_)
+    , finalizyng_(false)
+    , adapters_waiting_barrier_(settings_.mover_adapters_count() + 1) {
+  left_track_adapter_.SetAdapterSynchronizationBarrier(
+      &adapters_waiting_barrier_);
+  right_track_adapter_.SetAdapterSynchronizationBarrier(
+      &adapters_waiting_barrier_);
+}
 
 mover::TankTrackMover::~TankTrackMover() {
-  finalizyng_ = true;
+  Join();
 }
 
 void mover::TankTrackMover::OnMoveMessageReceived(const MoveMessage& message) {
@@ -19,29 +28,42 @@ void mover::TankTrackMover::OnMoveMessageReceived(const MoveMessage& message) {
 }
 
 void mover::TankTrackMover::Run() {
+  left_track_thread_.StartThread();
+  right_track_thread_.StartThread();
   while (!finalizyng_) {
     MoveMessage current_action;
     {
+      // TODO investigate problem with deadlock found by UT(repeat > 50)
       utils::synchronization::AutoLock auto_lock_(move_queue_lock_);
       if (!move_queue_.empty()) {
         current_action = move_queue_.front();
         move_queue_.pop();
+      } else {
+        continue;
       }
     }
+    adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() + 1);
     switch (current_action.move_type()) {
       case MoveType::MOVE_FORWARD: {
         Move(current_action.value());
+        adapters_waiting_barrier_.Wait();
         break;
       }
       case MoveType::ROTATE: {
         Rotate(current_action.value());
+        adapters_waiting_barrier_.Wait();
         break;
       }
       default:
-        // LOG ERROR
         break;
     }
   }
+}
+
+void mover::TankTrackMover::Join() {
+  finalizyng_ = true;
+  left_track_thread_.JoinThread();
+  right_track_thread_.JoinThread();
 }
 
 void mover::TankTrackMover::Move(const utils::Int centimeters) const {
@@ -53,10 +75,10 @@ void mover::TankTrackMover::Move(const utils::Int centimeters) const {
   if (milliseconds < 0) {
     left_track_adapter_.SpinBack(-milliseconds);
     right_track_adapter_.SpinBack(-milliseconds);
-    return;
+  } else {
+    left_track_adapter_.SpinForward(milliseconds);
+    right_track_adapter_.SpinForward(milliseconds);
   }
-  left_track_adapter_.SpinForward(milliseconds);
-  right_track_adapter_.SpinForward(milliseconds);
 }
 
 void mover::TankTrackMover::Rotate(const utils::Int angle) const {
@@ -70,9 +92,9 @@ void mover::TankTrackMover::Rotate(const utils::Int angle) const {
     // Rotate left
     left_track_adapter_.SpinBack(-milliseconds);
     right_track_adapter_.SpinForward(-milliseconds);
-    return;
+  } else {
+    // Rotate right
+    left_track_adapter_.SpinForward(milliseconds);
+    right_track_adapter_.SpinBack(milliseconds);
   }
-  // Rotate right
-  left_track_adapter_.SpinForward(milliseconds);
-  right_track_adapter_.SpinBack(milliseconds);
 }

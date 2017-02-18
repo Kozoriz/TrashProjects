@@ -23,6 +23,7 @@ class ScannerImpl : public Scanner {
   ~ScannerImpl();
   void OnScanningTriggered() override;
   void Run() override;
+  void Join() override;
   void SetServerMessageHandler(
       server_message_handler::ServerMessageHandler* message_handler);
 

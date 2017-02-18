@@ -4,7 +4,7 @@
 #include "scanner/scanner.h"
 #include "scanner/sensor_data_message.h"
 #include "utils/containers/queue.h"
-#include "utils/network/socket.h"
+#include "utils/network/socket_client.h"
 #include "utils/threads/synchronization/lock.h"
 
 #include "utils/containers/vector.h"
@@ -16,6 +16,7 @@ class ServerMessageHandlerImpl : public ServerMessageHandler {
   virtual ~ServerMessageHandlerImpl();
   void SendMessageToServer(const Message* message) override;
   void Run() override;
+  void Join() override;
 
  private:
   utils::Queue<const Message*> messages_to_server_;
@@ -24,18 +25,18 @@ class ServerMessageHandlerImpl : public ServerMessageHandler {
   mover::Mover& mover_;
   scanner::Scanner& scanner_;
   // TODO investigate testing without using of pointer
-  utils::Socket* server_socket_;
+  utils::SocketClient* server_socket_connection_;
 
 #if defined(BUILD_TESTS)
  public:
   utils::UInt get_messages_to_server_size() const {
     return messages_to_server_.size();
   }
-  void set_socket(utils::Socket* new_socket) {
-    if (server_socket_) {
-      delete server_socket_;
+  void set_socket(utils::SocketClient* new_socket) {
+    if (server_socket_connection_) {
+      delete server_socket_connection_;
     }
-    server_socket_ = new_socket;
+    server_socket_connection_ = new_socket;
   }
 #endif
 };

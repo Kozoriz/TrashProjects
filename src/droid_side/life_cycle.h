@@ -10,6 +10,8 @@
 
 #include "utils/threads/thread.h"
 
+#include "utils/profile.h"
+
 class LifeCycle {
  public:
   void InitComponents();
@@ -18,6 +20,8 @@ class LifeCycle {
   int ListenToServer();
 
  private:
+  utils::Profile* settings_;
+
   server_message_handler::ServerMessageHandler* message_handler_;
 
   mover::Mover* mover_;

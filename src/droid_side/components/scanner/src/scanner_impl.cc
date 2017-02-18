@@ -41,9 +41,9 @@ void scanner::ScannerImpl::Run() {
     utils::synchronization::AutoLock auto_lock(finalyzing_lock_);
     if (is_scanning_allowed_) {
       // TODO use profiler for max x/y
-      for (current_position_.alpha_; current_position_.alpha_ <= 179;
+      for (current_position_.alpha_ = 0; current_position_.alpha_ <= 179;
            ++current_position_.alpha_) {
-        for (current_position_.beta_; current_position_.beta_ <= 180;
+        for (current_position_.beta_ = 0; current_position_.beta_ <= 180;
              ++current_position_.beta_) {
           utils::UInt distance = sensor_.GetSensorData();
           utils::positions::Incline axelerometer_data =
@@ -55,6 +55,10 @@ void scanner::ScannerImpl::Run() {
       is_scanning_allowed_ = false;
     }
   }
+}
+
+void scanner::ScannerImpl::Join() {
+  finalyzing_ = true;
 }
 
 void scanner::ScannerImpl::SetServerMessageHandler(
