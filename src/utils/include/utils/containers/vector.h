@@ -8,9 +8,8 @@ namespace utils {
 /**
  * @brief Vector - TODO implement own vec
  */
-// template<typename T>
-// class Vector : public std::vector<T> {
-//};
+template <typename T>
+using Vector = std::vector<T>;
 
 typedef std::vector<Byte> ByteArray;
 }

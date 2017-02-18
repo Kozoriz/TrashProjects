@@ -1,8 +1,8 @@
 #pragma once
-#include "utils/threads/synchronization/lock.h"
-#include "utils/threads/synchronization/conditional_variable.h"
-#include "utils/threads/synchronization/auto_lock.h"
 #include "utils/numbers.h"
+#include "utils/threads/synchronization/auto_lock.h"
+#include "utils/threads/synchronization/conditional_variable.h"
+#include "utils/threads/synchronization/lock.h"
 
 namespace utils {
 
@@ -11,11 +11,10 @@ class TestAsyncWaiter {
   TestAsyncWaiter() : notified_(false), count_(0), lock_(), cond_var_() {}
 
   bool WaitFor(const uint32_t wait_count, const uint32_t milliseconds) {
-    utils::synchronization::AutoLock auto_lock(lock_);
     while (count_ < wait_count) {
       notified_ = false;
-      if (utils::synchronization::ConditionalVariable::kTimeout ==
-          cond_var_.WaitFor(auto_lock, milliseconds)) {
+      if (utils::synchronization::ConditionalVariable::ExitState::kTimeout ==
+          cond_var_.WaitFor(lock_, milliseconds)) {
         return false;
       }
     }
@@ -23,7 +22,6 @@ class TestAsyncWaiter {
   }
 
   void Notify() {
-    utils::synchronization::AutoLock auto_lock(lock_);
     notified_ = true;
     ++count_;
     cond_var_.Broadcast();

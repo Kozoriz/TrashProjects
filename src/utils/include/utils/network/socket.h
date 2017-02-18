@@ -1,7 +1,7 @@
 #pragma once
 
-#include "utils/numbers.h"
 #include "utils/containers/vector.h"
+#include "utils/numbers.h"
 
 namespace utils {
 class Socket {

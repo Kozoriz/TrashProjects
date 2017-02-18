@@ -1,10 +1,10 @@
 #pragma once
-#include "utils/network/socket.h"
 #include "gmock/gmock.h"
+#include "utils/network/socket.h"
 
 namespace utils {
 
-class MockSocket : public Socket {
+class MockSocket : public SocketClient {
  public:
   MOCK_METHOD1(Send, void(const ByteArray& message));
   MOCK_METHOD0(Receive, const utils::ByteArray&());

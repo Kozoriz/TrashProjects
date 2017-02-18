@@ -4,6 +4,10 @@
 
 namespace utils {
 namespace synchronization {
-typedef std::atomic<bool> AtomicBool;
+
+template <typename T>
+using Atomic = std::atomic<T>;
+
+typedef Atomic<bool> AtomicBool;
 }
 }

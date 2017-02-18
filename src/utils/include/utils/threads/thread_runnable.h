@@ -5,6 +5,7 @@ namespace threads {
 class ThreadRunnable {
  public:
   virtual void Run() = 0;
+  virtual void Join() = 0;
 };
 }
 }

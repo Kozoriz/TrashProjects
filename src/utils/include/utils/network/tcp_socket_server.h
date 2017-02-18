@@ -1,13 +1,13 @@
 #pragma once
 
-#include "utils/network/socket.h"
 #include "utils/containers/string.h"
+#include "utils/network/socket_server.h"
 
 namespace utils {
-class TcpSocket : public Socket {
+class TcpSocketServer : public Socket {
  public:
-  TcpSocket(const utils::String& address, const utils::UInt16 port);
-  ~TcpSocket();
+  TcpSocketServer(const utils::String& address, const utils::UInt16 port);
+  ~TcpSocketServer();
   void Send(const ByteArray& message) override;
   const ByteArray& Receive() override;
 
