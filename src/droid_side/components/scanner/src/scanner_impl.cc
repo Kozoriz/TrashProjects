@@ -3,6 +3,10 @@
 
 #include "utils/threads/synchronization/auto_lock.h"
 
+#include "utils/logger.h"
+
+CREATE_LOGGER("Scanner")
+
 namespace {
 utils::positions::Incline operator+(const utils::positions::Incline& a,
                                     const utils::positions::Incline& b) {
@@ -15,8 +19,8 @@ utils::positions::Incline operator+(const utils::positions::Incline& a,
 
 scanner::ScannerImpl::ScannerImpl(
     const sensor_adapter::SensorAdapter& sensor_adapter,
-    const servo_adapter::ServoAdapter& x_servo_adapter,
-    const servo_adapter::ServoAdapter& y_servo_adapter,
+    servo_adapter::ServoAdapter& x_servo_adapter,
+    servo_adapter::ServoAdapter& y_servo_adapter,
     const axelerometer_adapter::AxelerometerAdapter& axelerometer_adapter,
     const utils::Profile& settings)
     : sensor_(sensor_adapter)
@@ -25,20 +29,22 @@ scanner::ScannerImpl::ScannerImpl(
     , axelerometer_adapter_(axelerometer_adapter)
     , finalyzing_(false)
     , settings_(settings) {
-  current_position_.alpha_ = 0;
-  current_position_.beta_ = 0;
+  LOG_AUTO_TRACE();
 }
 
 scanner::ScannerImpl::~ScannerImpl() {
+  LOG_AUTO_TRACE();
   utils::synchronization::AutoLock auto_lock(finalyzing_lock_);
   finalyzing_ = true;
 }
 
 void scanner::ScannerImpl::OnScanningTriggered() {
+  LOG_AUTO_TRACE();
   is_scanning_allowed_ = true;
 }
 
 void scanner::ScannerImpl::Run() {
+  LOG_AUTO_TRACE();
   while (!finalyzing_) {
     utils::synchronization::AutoLock auto_lock(finalyzing_lock_);
     if (is_scanning_allowed_) {
@@ -46,45 +52,58 @@ void scanner::ScannerImpl::Run() {
       const utils::UInt max_beta = settings_.rotator_max_vertical();
       const utils::UInt min_alpha = settings_.rotator_min_horyzontal();
       const utils::UInt min_beta = settings_.rotator_min_vertical();
+      x_rotator_.SetAngle(min_alpha);
       for (current_position_.alpha_ = min_alpha;
            current_position_.alpha_ <= max_alpha;
            ++current_position_.alpha_) {
+        y_rotator_.SetAngle(min_beta);
         for (current_position_.beta_ = min_beta;
              current_position_.beta_ <= max_beta;
              ++current_position_.beta_) {
           utils::UInt distance = sensor_.GetSensorData();
           utils::positions::Incline axelerometer_data =
               axelerometer_adapter_.GetData();
+          LOG_DEBUG("Scanned data [x:y=d]: " << current_position_.alpha_ << ":"
+                                             << current_position_.beta_ << "="
+                                             << distance);
           SendDataToServer(MakeServerMessage(distance, axelerometer_data));
+          y_rotator_.ChangeAngle(1u);
         }
+        x_rotator_.ChangeAngle(1u);
       }
       SendDataToServer(MakeFinalMessage());
       is_scanning_allowed_ = false;
+      LOG_DEBUG("Scanning complete");
     }
   }
 }
 
 void scanner::ScannerImpl::Join() {
+  LOG_AUTO_TRACE();
   finalyzing_ = true;
 }
 
 void scanner::ScannerImpl::SetServerMessageHandler(
     server_message_handler::ServerMessageHandler* message_handler) {
+  LOG_AUTO_TRACE();
   message_handler_ = message_handler;
 }
 
 scanner::SensorDataMessage scanner::ScannerImpl::MakeServerMessage(
     utils::UInt distance, utils::positions::Incline axelerometer_data) {
+  LOG_AUTO_TRACE();
   return SensorDataMessage(distance, current_position_ + axelerometer_data);
 }
 
 scanner::SensorDataMessage scanner::ScannerImpl::MakeFinalMessage() {
+  LOG_AUTO_TRACE();
   utils::positions::Incline empty_incline;
   return SensorDataMessage(0, empty_incline, true);
 }
 
 void scanner::ScannerImpl::SendDataToServer(
     const scanner::SensorDataMessage& message) const {
+  LOG_AUTO_TRACE();
   message_handler_->SendMessageToServer(
       new scanner::SensorDataMessage(message));
 }

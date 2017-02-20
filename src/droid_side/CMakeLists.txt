@@ -42,7 +42,11 @@ endif()
 
 
 set(INSTAL_FILES
-logger_config.ini
+log4cplus.properties
+enviroment_scanner_client.ini
 )
 
 file(COPY ${INSTAL_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+install(TARGETS ${ClientExecutable} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
+install(FILES ${INSTAL_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)

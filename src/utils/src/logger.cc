@@ -5,6 +5,8 @@
 #include "log4cplus/loggingmacros.h"
 #endif
 
+#include "boost/filesystem.hpp"
+
 namespace logger {
 #if defined(ENABLE_LOG)
 log4cplus::LogLevel GetLog4cplusLevel(const LogLevel& level) {

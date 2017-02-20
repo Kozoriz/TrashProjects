@@ -2,10 +2,9 @@
 
 #include "life_cycle.h"
 
-CREATE_LOGGER("Main")
-
 int main(int argc, char** argv) {
-  logger::LoggerAutoPtr logger();
+  logger::LoggerAutoPtr logger;
+  CREATE_LOGGER("Main")
   LOG_AUTO_TRACE();
 
   LifeCycle life_cycle;

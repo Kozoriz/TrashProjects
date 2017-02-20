@@ -18,8 +18,8 @@ class ScannerImpl : public Scanner {
  public:
   ScannerImpl(
       const sensor_adapter::SensorAdapter& sensor_adapter,
-      const servo_adapter::ServoAdapter& x_servo_adapter,
-      const servo_adapter::ServoAdapter& y_servo_adapter,
+      servo_adapter::ServoAdapter& x_servo_adapter,
+      servo_adapter::ServoAdapter& y_servo_adapter,
       const axelerometer_adapter::AxelerometerAdapter& axelerometer_adapter,
       const utils::Profile& settings);
   ~ScannerImpl();
@@ -40,11 +40,11 @@ class ScannerImpl : public Scanner {
   /**
    * @brief x_rotator_ - horizontal sensor rotator
    */
-  const servo_adapter::ServoAdapter& x_rotator_;
+  servo_adapter::ServoAdapter& x_rotator_;
   /**
    * @brief y_rotator_ - vertical sensor rotator
    */
-  const servo_adapter::ServoAdapter& y_rotator_;
+  servo_adapter::ServoAdapter& y_rotator_;
   const axelerometer_adapter::AxelerometerAdapter& axelerometer_adapter_;
 
   server_message_handler::ServerMessageHandler* message_handler_;

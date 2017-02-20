@@ -2,6 +2,8 @@
 #include "utils/logger.h"
 #include "utils/threads/synchronization/auto_lock.h"
 
+CREATE_LOGGER("Mover")
+
 mover::TankTrackMover::TankTrackMover(engine_adapter::EngineAdapter& left,
                                       engine_adapter::EngineAdapter& right,
                                       const utils::Profile& settings)
@@ -12,6 +14,7 @@ mover::TankTrackMover::TankTrackMover(engine_adapter::EngineAdapter& left,
     , right_track_thread_(right_track_adapter_)
     , finalizyng_(false)
     , adapters_waiting_barrier_(settings_.mover_adapters_count() + 1) {
+  LOG_AUTO_TRACE();
   left_track_adapter_.SetAdapterSynchronizationBarrier(
       &adapters_waiting_barrier_);
   right_track_adapter_.SetAdapterSynchronizationBarrier(
@@ -19,15 +22,18 @@ mover::TankTrackMover::TankTrackMover(engine_adapter::EngineAdapter& left,
 }
 
 mover::TankTrackMover::~TankTrackMover() {
+  LOG_AUTO_TRACE();
   Join();
 }
 
 void mover::TankTrackMover::OnMoveMessageReceived(const MoveMessage& message) {
+  LOG_AUTO_TRACE();
   utils::synchronization::AutoLock auto_lock(move_queue_lock_);
   move_queue_.push(message);
 }
 
 void mover::TankTrackMover::Run() {
+  LOG_AUTO_TRACE();
   left_track_thread_.StartThread();
   right_track_thread_.StartThread();
   while (!finalizyng_) {
@@ -61,12 +67,14 @@ void mover::TankTrackMover::Run() {
 }
 
 void mover::TankTrackMover::Join() {
+  LOG_AUTO_TRACE();
   finalizyng_ = true;
   left_track_thread_.JoinThread();
   right_track_thread_.JoinThread();
 }
 
 void mover::TankTrackMover::Move(const utils::Int centimeters) const {
+  LOG_AUTO_TRACE();
   utils::Int milliseconds =
       centimeters / settings_.engine_centimeters_per_second();
   if (milliseconds < 0) {
@@ -79,6 +87,7 @@ void mover::TankTrackMover::Move(const utils::Int centimeters) const {
 }
 
 void mover::TankTrackMover::Rotate(const utils::Int angle) const {
+  LOG_AUTO_TRACE();
   utils::Int milliseconds = angle / settings_.engine_angle_per_second();
   if (milliseconds < 0) {
     // Rotate left

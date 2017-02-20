@@ -4,6 +4,10 @@
 #include "scanner/sensor_data_message.h"
 #include "utils/network/tcp_socket_client.h"
 
+#include "utils/logger.h"
+
+CREATE_LOGGER("ServerMessageHandler")
+
 namespace server_message_handler {
 
 ServerMessageHandlerImpl::ServerMessageHandlerImpl(
@@ -14,22 +18,26 @@ ServerMessageHandlerImpl::ServerMessageHandlerImpl(
     , scanner_(scanner)
     , server_socket_connection_(nullptr)
     , settings_(settings) {
+  LOG_AUTO_TRACE();
   server_socket_connection_ = new utils::TcpSocketClient(
       settings_.server_address(), settings_.server_port());
 }
 
 ServerMessageHandlerImpl::~ServerMessageHandlerImpl() {
+  LOG_AUTO_TRACE();
   if (server_socket_connection_) {
     delete server_socket_connection_;
   }
 }
 
 void ServerMessageHandlerImpl::SendMessageToServer(const Message* message) {
+  LOG_AUTO_TRACE();
   utils::synchronization::AutoLock auto_lock(messages_to_server_lock_);
   messages_to_server_.push(message);
 }
 
 void ServerMessageHandlerImpl::Run() {
+  LOG_AUTO_TRACE();
   server_socket_connection_->Init();
   while (true) {
     // Receiving from server
@@ -45,10 +53,11 @@ void ServerMessageHandlerImpl::Run() {
         break;
       }
       case MessageType::STOP_PROGRAM: {
+        LOG_DEBUG("STOP_PROGRAM message received");
         return;
       }
       default:
-        // LOG ERROR
+        LOG_WARN("Unknown message type received!");
         break;
     }
     {

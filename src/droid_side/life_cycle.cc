@@ -18,7 +18,7 @@ CREATE_LOGGER("Main")
 void LifeCycle::InitComponents() {
   LOG_AUTO_TRACE();
 
-  const utils::String file_name = "client_side_settings.ini";
+  const utils::String file_name = "enviroment_scanner_client.ini";
   settings_ = new utils::ProfileImpl(file_name);
 
 #ifdef AXELEROMETER_INCLUDED

@@ -66,6 +66,13 @@ TEST_F(ScannerImplTest, Run_FullCycle_CorrectCountOfCalls) {
 
   utils::TestAsyncWaiter waiter;
 
+  EXPECT_CALL(mock_horizontal_servo_adapter_, SetAngle(_));
+  EXPECT_CALL(mock_vertical_servo_adapter_, SetAngle(_)).Times(max_alpha + 1);
+  EXPECT_CALL(mock_vertical_servo_adapter_, ChangeAngle(_))
+      .Times(expected_calls_count);
+  EXPECT_CALL(mock_horizontal_servo_adapter_, ChangeAngle(_))
+      .Times(max_alpha + 1);
+
   EXPECT_CALL(mock_sensor_adapter_, GetSensorData())
       .Times(expected_calls_count);
   EXPECT_CALL(mock_axelerometer_adapter_, GetData())
