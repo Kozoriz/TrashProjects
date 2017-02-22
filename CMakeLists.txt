@@ -9,6 +9,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 option(BUILD_TESTS "Build Unit Tests" ON)
 option(AXELEROMETER_INCLUDED "If axelerometer connected to drone" OFF)
 option(ENABLE_LOG "If logging needed" ON)
+option(DEBUG_OPTION "Debug/Release" ON)
+
+if (DEBUG_OPTION)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
+else()
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+endif(DEBUG_OPTION)
 
 if (ENABLE_LOG)
   if (EXISTS "$ENV{LOG4CPLUS_DIRECTORY}/lib/liblog4cplus.a")

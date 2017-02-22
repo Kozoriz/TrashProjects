@@ -27,6 +27,7 @@ scanner::ScannerImpl::ScannerImpl(
     , x_rotator_(x_servo_adapter)
     , y_rotator_(y_servo_adapter)
     , axelerometer_adapter_(axelerometer_adapter)
+    , is_scanning_allowed_(false)
     , finalyzing_(false)
     , settings_(settings) {
   LOG_AUTO_TRACE();
