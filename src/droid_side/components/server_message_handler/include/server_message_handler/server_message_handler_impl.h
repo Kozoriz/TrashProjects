@@ -5,7 +5,7 @@
 #include "scanner/sensor_data_message.h"
 #include "utils/containers/queue.h"
 #include "utils/network/socket_client.h"
-#include "utils/threads/synchronization/lock.h"
+#include "utils/threads/synchronization/conditional_variable.h"
 
 #include "utils/containers/vector.h"
 #include "utils/profile.h"
@@ -30,6 +30,9 @@ class ServerMessageHandlerImpl : public ServerMessageHandler {
   // TODO investigate testing without using of pointer
   utils::SocketClient* server_socket_connection_;
   const utils::Profile& settings_;
+
+  utils::synchronization::Lock wait_lock_;
+  utils::synchronization::ConditionalVariable wait_cond_var_;
 
 #if defined(BUILD_TESTS)
  public:

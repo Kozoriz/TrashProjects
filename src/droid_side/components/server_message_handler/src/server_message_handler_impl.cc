@@ -10,6 +10,10 @@ CREATE_LOGGER("ServerMessageHandler")
 
 namespace server_message_handler {
 
+namespace {
+const utils::UInt process_messages_timeout = 1000u;
+}
+
 ServerMessageHandlerImpl::ServerMessageHandlerImpl(
     mover::Mover& mover,
     scanner::Scanner& scanner,
@@ -40,26 +44,34 @@ void ServerMessageHandlerImpl::Run() {
   LOG_AUTO_TRACE();
   server_socket_connection_->Init();
   while (true) {
-    // Receiving from server
-    const utils::ByteArray& raw_data = server_socket_connection_->Receive();
-    Message message(raw_data);
-    switch (message.type()) {
-      case MessageType::MOVE: {
-        mover_.OnMoveMessageReceived(mover::MoveMessage(raw_data));
+    utils::ByteArray raw_data;
+    while(true) {
+      // Receiving from server
+      raw_data.resize(0);
+      raw_data = server_socket_connection_->Receive();
+      if (0 == raw_data.size()) {
         break;
       }
-      case MessageType::START_SCAN: {
-        scanner_.OnScanningTriggered();
-        break;
+      Message message(raw_data);
+      switch (message.type()) {
+        case MessageType::MOVE: {
+          mover_.OnMoveMessageReceived(mover::MoveMessage(raw_data));
+          break;
+        }
+        case MessageType::START_SCAN: {
+          scanner_.OnScanningTriggered();
+          break;
+        }
+        case MessageType::STOP_PROGRAM: {
+          LOG_DEBUG("STOP_PROGRAM message received");
+          return;
+        }
+        default:
+          LOG_WARN("Unknown message type received!");
+          break;
       }
-      case MessageType::STOP_PROGRAM: {
-        LOG_DEBUG("STOP_PROGRAM message received");
-        return;
-      }
-      default:
-        LOG_WARN("Unknown message type received!");
-        break;
     }
+
     {
       utils::synchronization::AutoLock auto_lock(messages_to_server_lock_);
       while (!messages_to_server_.empty()) {
@@ -72,6 +84,7 @@ void ServerMessageHandlerImpl::Run() {
         delete message;
       }
     }
+    wait_cond_var_.WaitFor(wait_lock_, process_messages_timeout);
   }
 }
 

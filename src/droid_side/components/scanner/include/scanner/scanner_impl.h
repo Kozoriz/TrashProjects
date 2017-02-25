@@ -8,6 +8,7 @@
 #include "utils/profile.h"
 #include "utils/threads/synchronization/atomic.h"
 #include "utils/threads/synchronization/lock.h"
+#include "utils/threads/synchronization/conditional_variable.h"
 
 namespace server_message_handler {
 class ServerMessageHandler;
@@ -55,6 +56,8 @@ class ScannerImpl : public Scanner {
   utils::positions::Incline current_position_;
 
   utils::synchronization::Lock finalyzing_lock_;
+  utils::synchronization::ConditionalVariable triggering_wait_cond_var_;
+
 
   const utils::Profile& settings_;
 };

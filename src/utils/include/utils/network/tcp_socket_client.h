@@ -14,6 +14,9 @@ class TcpSocketClient : public SocketClient {
   const ByteArray& Receive() override;
   void Init() override;
 
+ protected:
+  void EstabilishConnection();
+
  private:
   const utils::String address_;
   const utils::UInt8 port_;

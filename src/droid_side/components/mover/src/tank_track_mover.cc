@@ -29,7 +29,7 @@ mover::TankTrackMover::~TankTrackMover() {
 void mover::TankTrackMover::OnMoveMessageReceived(const MoveMessage& message) {
   LOG_AUTO_TRACE();
   utils::synchronization::AutoLock auto_lock(move_queue_lock_);
-  move_queue_.push(message);
+  move_queue_.PushMessage(message);
 }
 
 void mover::TankTrackMover::Run() {
@@ -37,18 +37,14 @@ void mover::TankTrackMover::Run() {
   left_track_thread_.StartThread();
   right_track_thread_.StartThread();
   while (!finalizyng_) {
+    move_queue_.WaitNewMessages();
+    adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() + 1);
     MoveMessage current_action;
     {
       // TODO investigate problem with deadlock found by UT(repeat > 50)
       utils::synchronization::AutoLock auto_lock_(move_queue_lock_);
-      if (!move_queue_.empty()) {
-        current_action = move_queue_.front();
-        move_queue_.pop();
-      } else {
-        continue;
-      }
+        current_action = move_queue_.GetMessage();
     }
-    adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() + 1);
     switch (current_action.move_type()) {
       case MoveType::MOVE_FORWARD: {
         Move(current_action.value());
@@ -71,6 +67,7 @@ void mover::TankTrackMover::Join() {
   finalizyng_ = true;
   left_track_thread_.JoinThread();
   right_track_thread_.JoinThread();
+  move_queue_.Finalyze();
 }
 
 void mover::TankTrackMover::Move(const utils::Int centimeters) const {

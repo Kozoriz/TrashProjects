@@ -15,6 +15,8 @@ utils::positions::Incline operator+(const utils::positions::Incline& a,
   result.beta_ = a.beta_ + b.beta_;
   return result;
 }
+
+const utils::UInt default_waiting_timeout = 100u;
 }
 
 scanner::ScannerImpl::ScannerImpl(
@@ -35,19 +37,18 @@ scanner::ScannerImpl::ScannerImpl(
 
 scanner::ScannerImpl::~ScannerImpl() {
   LOG_AUTO_TRACE();
-  utils::synchronization::AutoLock auto_lock(finalyzing_lock_);
-  finalyzing_ = true;
+  Join();
 }
 
 void scanner::ScannerImpl::OnScanningTriggered() {
   LOG_AUTO_TRACE();
   is_scanning_allowed_ = true;
+  triggering_wait_cond_var_.Broadcast();
 }
 
 void scanner::ScannerImpl::Run() {
   LOG_AUTO_TRACE();
   while (!finalyzing_) {
-    utils::synchronization::AutoLock auto_lock(finalyzing_lock_);
     if (is_scanning_allowed_) {
       const utils::UInt max_alpha = settings_.rotator_max_horyzontal();
       const utils::UInt max_beta = settings_.rotator_max_vertical();
@@ -76,12 +77,15 @@ void scanner::ScannerImpl::Run() {
       is_scanning_allowed_ = false;
       LOG_DEBUG("Scanning complete");
     }
+    triggering_wait_cond_var_.WaitFor(finalyzing_lock_, default_waiting_timeout);
   }
 }
 
 void scanner::ScannerImpl::Join() {
   LOG_AUTO_TRACE();
+  is_scanning_allowed_ = false;
   finalyzing_ = true;
+  triggering_wait_cond_var_.Broadcast();
 }
 
 void scanner::ScannerImpl::SetServerMessageHandler(

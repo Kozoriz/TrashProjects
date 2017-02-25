@@ -60,13 +60,12 @@ TEST_F(ServerMessageHandlerImplTest, Run_SeveralMessagesToServer_SendAll) {
             server_message_handler_->get_messages_to_server_size());
 
   // Will go to default section
-  utils::ByteArray raw_default_message =
-      Message(MessageType::SENSOR_DATA).ToRawData();
+  utils::ByteArray raw_empty_message;
   utils::ByteArray raw_exit_message =
       Message(MessageType::STOP_PROGRAM).ToRawData();
 
   EXPECT_CALL(*mock_socket_, Receive())
-      .WillOnce(ReturnRef(raw_default_message))
+      .WillOnce(ReturnRef(raw_empty_message))
       .WillOnce(ReturnRef(raw_exit_message));
 
   EXPECT_CALL(*mock_socket_, Send(_)).Times(messages_count);

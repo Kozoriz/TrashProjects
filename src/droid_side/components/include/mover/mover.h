@@ -1,12 +1,12 @@
 #pragma once
 
 #include "mover/move_message.h"
-#include "utils/containers/queue.h"
+#include "utils/containers/message_queue.h"
 #include "utils/threads/synchronization/lock.h"
 #include "utils/threads/thread_runnable.h"
 
 namespace mover {
-typedef utils::Queue<MoveMessage> MoveMessageQueue;
+typedef utils::MessageQueue<MoveMessage> MoveMessageQueue;
 
 class Mover : public utils::threads::ThreadRunnable {
  public:

@@ -84,8 +84,8 @@ TEST_F(ScannerImplTest, Run_FullCycle_CorrectCountOfCalls) {
               SendMessageToServer(ExpectFinalMessage(true)))
       .WillOnce(utils::NotifyTestAsyncWaiter(&waiter));
 
-  scanner_.OnScanningTriggered();
   scanner_thread_.StartThread();
+  scanner_.OnScanningTriggered();
   waiter.WaitFor(1, 3000);
   scanner_thread_.JoinThread();
 }
