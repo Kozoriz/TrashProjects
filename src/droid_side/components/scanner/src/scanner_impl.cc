@@ -94,21 +94,21 @@ void scanner::ScannerImpl::SetServerMessageHandler(
   message_handler_ = message_handler;
 }
 
-scanner::SensorDataMessage scanner::ScannerImpl::MakeServerMessage(
+messages::SensorDataMessage scanner::ScannerImpl::MakeServerMessage(
     utils::UInt distance, utils::positions::Incline axelerometer_data) {
   LOG_AUTO_TRACE();
-  return SensorDataMessage(distance, current_position_ + axelerometer_data);
+  return messages::SensorDataMessage(distance, current_position_ + axelerometer_data);
 }
 
-scanner::SensorDataMessage scanner::ScannerImpl::MakeFinalMessage() {
+messages::SensorDataMessage scanner::ScannerImpl::MakeFinalMessage() {
   LOG_AUTO_TRACE();
   utils::positions::Incline empty_incline;
-  return SensorDataMessage(0, empty_incline, true);
+  return messages::SensorDataMessage(0, empty_incline, true);
 }
 
 void scanner::ScannerImpl::SendDataToServer(
-    const scanner::SensorDataMessage& message) const {
+    const messages::SensorDataMessage& message) const {
   LOG_AUTO_TRACE();
   message_handler_->SendMessageToServer(
-      new scanner::SensorDataMessage(message));
+      new messages::SensorDataMessage(message));
 }

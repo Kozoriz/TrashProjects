@@ -41,6 +41,11 @@ if(BUILD_TESTS)
     enable_testing()
 endif()
 
+set(MESSAGES_INCLUDE_DIR src/messages/include)
+include_directories(
+${MESSAGES_INCLUDE_DIR}
+) 
+
 add_subdirectory(src/3rd_party)
 add_subdirectory(src/utils)
 add_subdirectory(src/droid_side)

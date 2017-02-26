@@ -6,7 +6,7 @@
 #include "server_message_handler/mock_server_message_handler.h"
 #include "servo_adapter/mock_servo_adapter.h"
 
-#include "scanner/sensor_data_message.h"
+#include "messages/sensor_data_message.h"
 
 #include "utils/async_waiter.h"
 #include "utils/mock_profile.h"
@@ -45,8 +45,8 @@ class ScannerImplTest : public ::testing::Test {
 };
 
 MATCHER_P(ExpectFinalMessage, is_final, "") {
-  const scanner::SensorDataMessage* message_ptr =
-      static_cast<const scanner::SensorDataMessage*>(arg);
+  const messages::SensorDataMessage* message_ptr =
+      static_cast<const messages::SensorDataMessage*>(arg);
   const utils::Byte first_byte = message_ptr->ToRawData()[0];
   const bool final = static_cast<bool>((first_byte & 0x10) >> 4);
   return is_final == final;

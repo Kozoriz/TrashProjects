@@ -1,9 +1,9 @@
 #pragma once
 
-#include "server_message_handler/message.h"
+#include "messages/message.h"
 #include "utils/structures/position.h"
 
-namespace mover {
+namespace messages {
 /**
  * @brief The MoveType enum - with values in 0xmask for 4-5 bits ob Byte
  */
@@ -14,20 +14,20 @@ enum class MoveType {
 };
 const utils::Byte kMoveTypeMask = 0x1A;  // 000 111 00
 
-class MoveMessage : public server_message_handler::Message {
+class MoveMessage : public Message {
  public:
   MoveMessage()
-      : server_message_handler::Message(
-            server_message_handler::MessageType::MOVE)
+      : messages::Message(
+            messages::MessageType::MOVE)
       , move_type_(MoveType::INVALID_TYPE) {}
   MoveMessage(const MoveType move_type, const utils::Int16 value)
-      : server_message_handler::Message(
-            server_message_handler::MessageType::MOVE)
+      : messages::Message(
+            messages::MessageType::MOVE)
       , move_type_(move_type)
       , value_(value) {}
 
   MoveMessage(const utils::ByteArray& raw_data)
-      : server_message_handler::Message(raw_data) {
+      : messages::Message(raw_data) {
     move_type_ = static_cast<MoveType>(raw_data[0] & kMoveTypeMask);
     value_ = static_cast<utils::Int>(raw_data[1]) << 8;
     value_ += static_cast<utils::Int>(raw_data[2]);
@@ -64,4 +64,4 @@ class MoveMessage : public server_message_handler::Message {
    */
   utils::Int16 value_;
 };
-}  // namespace mover
+}  // namespace messages

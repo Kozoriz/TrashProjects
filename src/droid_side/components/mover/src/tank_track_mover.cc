@@ -26,7 +26,7 @@ mover::TankTrackMover::~TankTrackMover() {
   Join();
 }
 
-void mover::TankTrackMover::OnMoveMessageReceived(const MoveMessage& message) {
+void mover::TankTrackMover::OnMoveMessageReceived(const messages::MoveMessage &message) {
   LOG_AUTO_TRACE();
   utils::synchronization::AutoLock auto_lock(move_queue_lock_);
   move_queue_.PushMessage(message);
@@ -39,19 +39,19 @@ void mover::TankTrackMover::Run() {
   while (!finalizyng_) {
     move_queue_.WaitNewMessages();
     adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() + 1);
-    MoveMessage current_action;
+    messages::MoveMessage current_action;
     {
       // TODO investigate problem with deadlock found by UT(repeat > 50)
       utils::synchronization::AutoLock auto_lock_(move_queue_lock_);
         current_action = move_queue_.GetMessage();
     }
     switch (current_action.move_type()) {
-      case MoveType::MOVE_FORWARD: {
+      case messages::MoveType::MOVE_FORWARD: {
         Move(current_action.value());
         adapters_waiting_barrier_.Wait();
         break;
       }
-      case MoveType::ROTATE: {
+      case messages::MoveType::ROTATE: {
         Rotate(current_action.value());
         adapters_waiting_barrier_.Wait();
         break;

@@ -2,7 +2,7 @@
 
 #include "axelerometer_adapter/axelerometer_adapter.h"
 #include "scanner/scanner.h"
-#include "scanner/sensor_data_message.h"
+#include "messages/sensor_data_message.h"
 #include "sensor_adapter/sensor_adapter.h"
 #include "servo_adapter/servo_adapter.h"
 #include "utils/profile.h"
@@ -31,10 +31,10 @@ class ScannerImpl : public Scanner {
       server_message_handler::ServerMessageHandler* message_handler);
 
  private:
-  SensorDataMessage MakeServerMessage(
+  messages::SensorDataMessage MakeServerMessage(
       utils::UInt distance, utils::positions::Incline axelerometer_data);
-  scanner::SensorDataMessage MakeFinalMessage();
-  void SendDataToServer(const SensorDataMessage& message) const;
+  messages::SensorDataMessage MakeFinalMessage();
+  void SendDataToServer(const messages::SensorDataMessage& message) const;
 
  private:
   const sensor_adapter::SensorAdapter& sensor_;

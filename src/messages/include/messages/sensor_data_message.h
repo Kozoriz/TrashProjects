@@ -1,22 +1,22 @@
 #pragma once
 
-#include "server_message_handler/message.h"
+#include "messages/message.h"
 #include "utils/structures/position.h"
 
-namespace scanner {
-class SensorDataMessage : public server_message_handler::Message {
+namespace messages {
+class SensorDataMessage : public Message {
  public:
   SensorDataMessage(const utils::UInt16 distance,
                     const utils::positions::Incline& incline,
                     const bool is_final = false)
-      : server_message_handler::Message(
-            server_message_handler::MessageType::SENSOR_DATA)
+      : messages::Message(
+            messages::MessageType::SENSOR_DATA)
       , final_message_(is_final)
       , distance_(distance)
       , sensor_position_(incline) {}
 
   SensorDataMessage(const utils::ByteArray& raw_data)
-      : server_message_handler::Message(raw_data) {
+      : messages::Message(raw_data) {
     final_message_ = static_cast<bool>((raw_data[0] & 0x10) >> 4);
 
     distance_ = static_cast<utils::UInt16>(raw_data[1] << 8);
@@ -48,4 +48,4 @@ class SensorDataMessage : public server_message_handler::Message {
   utils::UInt16 distance_;
   utils::positions::Incline sensor_position_;
 };
-}
+}  // namespace messages

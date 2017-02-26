@@ -53,7 +53,7 @@ TEST_F(ServerMessageHandlerImplTest, Run_SeveralMessagesToServer_SendAll) {
 
   for (int i = 0; i < messages_count; ++i) {
     server_message_handler_->SendMessageToServer(
-        new Message(MessageType::SENSOR_DATA));
+        new messages::Message(messages::MessageType::SENSOR_DATA));
   }
 
   ASSERT_EQ(messages_count,
@@ -62,7 +62,7 @@ TEST_F(ServerMessageHandlerImplTest, Run_SeveralMessagesToServer_SendAll) {
   // Will go to default section
   utils::ByteArray raw_empty_message;
   utils::ByteArray raw_exit_message =
-      Message(MessageType::STOP_PROGRAM).ToRawData();
+      messages::Message(messages::MessageType::STOP_PROGRAM).ToRawData();
 
   EXPECT_CALL(*mock_socket_, Receive())
       .WillOnce(ReturnRef(raw_empty_message))
@@ -78,9 +78,9 @@ TEST_F(ServerMessageHandlerImplTest, Run_SeveralMessagesToServer_SendAll) {
 TEST_F(ServerMessageHandlerImplTest, Run_MoveFromServer_CorrectCall) {
   using namespace server_message_handler;
 
-  utils::ByteArray raw_move_message = Message(MessageType::MOVE).ToRawData();
+  utils::ByteArray raw_move_message = messages::Message(messages::MessageType::MOVE).ToRawData();
   utils::ByteArray raw_exit_message =
-      Message(MessageType::STOP_PROGRAM).ToRawData();
+      messages::Message(messages::MessageType::STOP_PROGRAM).ToRawData();
 
   EXPECT_CALL(*mock_socket_, Receive())
       .WillOnce(ReturnRef(raw_move_message))
@@ -96,9 +96,9 @@ TEST_F(ServerMessageHandlerImplTest, Run_StartScanFromServer_CorrectCall) {
   using namespace server_message_handler;
 
   utils::ByteArray raw_scan_message =
-      Message(MessageType::START_SCAN).ToRawData();
+      messages::Message(messages::MessageType::START_SCAN).ToRawData();
   utils::ByteArray raw_exit_message =
-      Message(MessageType::STOP_PROGRAM).ToRawData();
+      messages::Message(messages::MessageType::STOP_PROGRAM).ToRawData();
 
   EXPECT_CALL(*mock_socket_, Receive())
       .WillOnce(ReturnRef(raw_scan_message))

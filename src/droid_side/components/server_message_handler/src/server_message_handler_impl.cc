@@ -1,7 +1,7 @@
 #include "server_message_handler/server_message_handler_impl.h"
 #include "utils/threads/synchronization/auto_lock.h"
 
-#include "scanner/sensor_data_message.h"
+#include "messages/sensor_data_message.h"
 #include "utils/network/tcp_socket_client.h"
 
 #include "utils/logger.h"
@@ -34,7 +34,7 @@ ServerMessageHandlerImpl::~ServerMessageHandlerImpl() {
   }
 }
 
-void ServerMessageHandlerImpl::SendMessageToServer(const Message* message) {
+void ServerMessageHandlerImpl::SendMessageToServer(const messages::Message* message) {
   LOG_AUTO_TRACE();
   utils::synchronization::AutoLock auto_lock(messages_to_server_lock_);
   messages_to_server_.push(message);
@@ -52,17 +52,17 @@ void ServerMessageHandlerImpl::Run() {
       if (0 == raw_data.size()) {
         break;
       }
-      Message message(raw_data);
+      messages::Message message(raw_data);
       switch (message.type()) {
-        case MessageType::MOVE: {
-          mover_.OnMoveMessageReceived(mover::MoveMessage(raw_data));
+        case messages::MessageType::MOVE: {
+          mover_.OnMoveMessageReceived(messages::MoveMessage(raw_data));
           break;
         }
-        case MessageType::START_SCAN: {
+        case messages::MessageType::START_SCAN: {
           scanner_.OnScanningTriggered();
           break;
         }
-        case MessageType::STOP_PROGRAM: {
+        case messages::MessageType::STOP_PROGRAM: {
           LOG_DEBUG("STOP_PROGRAM message received");
           return;
         }
@@ -75,8 +75,8 @@ void ServerMessageHandlerImpl::Run() {
     {
       utils::synchronization::AutoLock auto_lock(messages_to_server_lock_);
       while (!messages_to_server_.empty()) {
-        const scanner::SensorDataMessage* message =
-            static_cast<const scanner::SensorDataMessage*>(
+        const messages::SensorDataMessage* message =
+            static_cast<const messages::SensorDataMessage*>(
                 messages_to_server_.front());
         messages_to_server_.pop();
         // Sending to server
@@ -89,5 +89,18 @@ void ServerMessageHandlerImpl::Run() {
 }
 
 void ServerMessageHandlerImpl::Join() {}
+
+#if defined(BUILD_TESTS)
+utils::UInt ServerMessageHandlerImpl::get_messages_to_server_size() const {
+    return messages_to_server_.size();
+}
+
+void ServerMessageHandlerImpl::set_socket(utils::SocketClient *new_socket) {
+    if (server_socket_connection_) {
+        delete server_socket_connection_;
+    }
+    server_socket_connection_ = new_socket;
+}
+#endif
 
 }  // namespace server_message_handler

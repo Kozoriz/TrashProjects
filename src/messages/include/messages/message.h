@@ -3,7 +3,7 @@
 #include "utils/containers/vector.h"
 #include "utils/structures/position.h"
 
-namespace server_message_handler {
+namespace messages {
 /**
  * @brief The MessageType enum - with values 0xmask for 1-3 bits of Byte
  */
@@ -48,4 +48,4 @@ class Message {
  protected:
   MessageType type_;
 };
-}
+}  // namespace messages

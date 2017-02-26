@@ -14,7 +14,7 @@ class TankTrackMover : public Mover {
                  engine_adapter::EngineAdapter& right,
                  const utils::Profile& settings);
   ~TankTrackMover();
-  void OnMoveMessageReceived(const MoveMessage& message) override;
+  void OnMoveMessageReceived(const messages::MoveMessage& message) override;
   void Run() override;
   void Join() override;
 
