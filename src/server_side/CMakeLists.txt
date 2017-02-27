@@ -1,18 +1,26 @@
 
 add_subdirectory(components)
 
-include_directories(
-    components/include
-    ${UTILS_INCLUDE_PATH}
-    )
+set(ServerExecutable ${PROJECT}_Server)
 
-set(ClientExecutable ${PROJECT}_Server)
+include_directories(
+  ${UTILS_INCLUDE_PATH}
+  ${COMPONENTS_DIR}/include
+  ${COMPONENTS_DIR}/drone_messsage_handler/include
+  ${COMPONENTS_DIR}/drone_mover/include
+  ${COMPONENTS_DIR}/guide/include
+  ${COMPONENTS_DIR}/map_assembler/include
+  ${COMPONENTS_DIR}/map_detalization_analyzer/include
+  ${COMPONENTS_DIR}/snapshot_processor/include
+)
 
 set(SOURCES
 	main.cc
+  life_cycle.cc
 )
 
 set(LIBRARIES
+    Utils
     DroneMessageHandler
     DroneMover
     Guide
@@ -21,10 +29,21 @@ set(LIBRARIES
     SnapshotProcessor
 )
 
-add_executable(${ClientExecutable} ${SOURCES})
-target_link_libraries (${ClientExecutable} ${LIBRARIES})
+add_executable(${ServerExecutable} ${SOURCES})
+target_link_libraries (${ServerExecutable} ${LIBRARIES})
 
 if(BUILD_TESTS)
-        set(UNIT_TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/unit_tests)
-        add_subdirectory(${UNIT_TESTS_DIR})
+    set(UNIT_TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/unit_tests)
+    add_subdirectory(${UNIT_TESTS_DIR})
 endif()
+
+
+set(INSTAL_FILES
+log4cplus.properties
+enviroment_scanner_server.ini
+)
+
+file(COPY ${INSTAL_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+install(TARGETS ${ServerExecutable} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
+install(FILES ${INSTAL_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)

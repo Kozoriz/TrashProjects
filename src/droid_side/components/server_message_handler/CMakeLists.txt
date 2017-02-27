@@ -6,7 +6,6 @@ file(GLOB SOURCES src/*.cc)
 
 set(LIBRARIES
     Utils
-    GoogleTest
     )
 
 add_library("ServerMessageHandler" ${SOURCES})

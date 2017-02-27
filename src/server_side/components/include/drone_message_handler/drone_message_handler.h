@@ -1,7 +1,10 @@
 #pragma once
+#include "utils/threads/thread_runnable.h"
+#include "messages/message.h"
+
 namespace drone_message_handler {
-class DroneMessageHandler {
+class DroneMessageHandler : public utils::threads::ThreadRunnable {
  public:
-  virtual void foo() = 0;
+  virtual void SendMessageToDroid(const messages::Message* message) = 0;
 };
 }

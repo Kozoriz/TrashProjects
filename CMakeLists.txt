@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 set (PROJECT EnvironmentScanner)
 
-find_package (Threads)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+find_package (Threads)
 
 option(BUILD_TESTS "Build Unit Tests" ON)
 option(AXELEROMETER_INCLUDED "If axelerometer connected to drone" OFF)
