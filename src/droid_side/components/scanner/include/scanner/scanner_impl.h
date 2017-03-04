@@ -28,7 +28,7 @@ class ScannerImpl : public Scanner {
   void Run() override;
   void Join() override;
   void SetServerMessageHandler(
-      server_message_handler::ServerMessageHandler* message_handler);
+      server_message_handler::ServerMessageHandler* message_handler) override;
 
  private:
   messages::SensorDataMessage MakeServerMessage(
@@ -57,7 +57,6 @@ class ScannerImpl : public Scanner {
 
   utils::synchronization::Lock finalyzing_lock_;
   utils::synchronization::ConditionalVariable triggering_wait_cond_var_;
-
 
   const utils::Profile& settings_;
 };

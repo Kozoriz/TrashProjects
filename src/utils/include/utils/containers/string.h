@@ -13,6 +13,6 @@ typedef std::stringstream Stringstream;
 
 template <typename Type>
 utils::String ConvertToString(Type value) {
-  return boost::lexical_cast<utils::String>(value);
+  return std::to_string(value);
 }
 }

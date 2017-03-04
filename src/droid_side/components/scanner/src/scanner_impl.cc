@@ -56,11 +56,11 @@ void scanner::ScannerImpl::Run() {
       const utils::UInt min_beta = settings_.rotator_min_vertical();
       x_rotator_.SetAngle(min_alpha);
       for (current_position_.alpha_ = min_alpha;
-           current_position_.alpha_ <= max_alpha;
+           current_position_.alpha_ <= max_alpha && !finalyzing_;
            ++current_position_.alpha_) {
         y_rotator_.SetAngle(min_beta);
         for (current_position_.beta_ = min_beta;
-             current_position_.beta_ <= max_beta;
+             current_position_.beta_ <= max_beta && !finalyzing_;
              ++current_position_.beta_) {
           utils::UInt distance = sensor_.GetSensorData();
           utils::positions::Incline axelerometer_data =
@@ -69,6 +69,7 @@ void scanner::ScannerImpl::Run() {
                                              << current_position_.beta_ << "="
                                              << distance);
           SendDataToServer(MakeServerMessage(distance, axelerometer_data));
+//          usleep(100000);
           y_rotator_.ChangeAngle(1u);
         }
         x_rotator_.ChangeAngle(1u);
@@ -77,7 +78,8 @@ void scanner::ScannerImpl::Run() {
       is_scanning_allowed_ = false;
       LOG_DEBUG("Scanning complete");
     }
-    triggering_wait_cond_var_.WaitFor(finalyzing_lock_, default_waiting_timeout);
+    triggering_wait_cond_var_.WaitFor(finalyzing_lock_,
+                                      default_waiting_timeout);
   }
 }
 
@@ -97,7 +99,8 @@ void scanner::ScannerImpl::SetServerMessageHandler(
 messages::SensorDataMessage scanner::ScannerImpl::MakeServerMessage(
     utils::UInt distance, utils::positions::Incline axelerometer_data) {
   LOG_AUTO_TRACE();
-  return messages::SensorDataMessage(distance, current_position_ + axelerometer_data);
+  return messages::SensorDataMessage(distance,
+                                     current_position_ + axelerometer_data);
 }
 
 messages::SensorDataMessage scanner::ScannerImpl::MakeFinalMessage() {
@@ -109,6 +112,9 @@ messages::SensorDataMessage scanner::ScannerImpl::MakeFinalMessage() {
 void scanner::ScannerImpl::SendDataToServer(
     const messages::SensorDataMessage& message) const {
   LOG_AUTO_TRACE();
+  if (finalyzing_) {
+    return;
+  }
   message_handler_->SendMessageToServer(
       new messages::SensorDataMessage(message));
 }

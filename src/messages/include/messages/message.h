@@ -14,15 +14,16 @@ enum class MessageType {
   STOP_PROGRAM = 0x80  // 100 00000
 };
 const utils::Byte kMessageTypeMask = 0xE0;  // 111 00000
+const utils::Int kMaxRawDataSize = 5u;
 
 class Message {
   /*
    * First Byte always header data (message type description)
    *
    * Message from server
-   * |3|2|3reserved|16| = 24bits = 3Bytes
+   * |3|3|2reserved|16| = 24bits = 3Bytes
    * 3 - Message type
-   * 2 - Move type
+   * 3 - Move type
    * 16 - Move value (int)
    *
    * Message to server
@@ -33,19 +34,27 @@ class Message {
    * 16=8*2 - incline (2 angles) 0-180
    */
  public:
-  Message(const MessageType type) : type_(type) {}
+  Message(const MessageType type) : type_(type) {
+    raw_data_array_.resize(kMaxRawDataSize);
+    raw_data_array_[0] = static_cast<utils::Byte>(type_);
+  }
+
   Message(const utils::ByteArray& raw_data) {
-    type_ = static_cast<MessageType>(raw_data[0] & kMessageTypeMask);
+    raw_data_array_ = raw_data;
+    raw_data_array_.resize(kMaxRawDataSize);
+    type_ = static_cast<MessageType>(raw_data_array_[0] & kMessageTypeMask);
   }
-  virtual utils::ByteArray ToRawData() const {
-    utils::Byte elem_0 = static_cast<utils::Byte>(type_);
-    return {elem_0};
+
+  virtual const utils::ByteArray& ToRawData() const {
+    return raw_data_array_;
   }
+
   MessageType type() {
     return type_;
   }
 
  protected:
   MessageType type_;
+  utils::ByteArray raw_data_array_;
 };
 }  // namespace messages

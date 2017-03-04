@@ -9,12 +9,13 @@
 namespace utils {
 
 namespace {
-  const utils::UInt new_messages_wait_default_timeout  = 100u;
+// TODO use profiler
+const utils::UInt new_messages_wait_default_timeout = 10u;
 }
 
-template<typename MessageType>
+template <typename MessageType>
 class MessageQueue {
-public:
+ public:
   void PushMessage(const MessageType& message);
   MessageType GetMessage();
   void WaitNewMessages();
@@ -25,7 +26,7 @@ public:
   MessageQueue();
   ~MessageQueue();
 
-private:
+ private:
   Queue<MessageType> queue_;
   synchronization::Lock queue_lock_;
   synchronization::Lock wait_lock_;
@@ -33,8 +34,8 @@ private:
   synchronization::AtomicBool finalyzing_;
 };
 
-template<typename MessageType>
-void MessageQueue<MessageType>::PushMessage(const MessageType &message) {
+template <typename MessageType>
+void MessageQueue<MessageType>::PushMessage(const MessageType& message) {
   if (IsFinalyzing()) {
     return;
   }
@@ -45,51 +46,46 @@ void MessageQueue<MessageType>::PushMessage(const MessageType &message) {
   new_messages_cond_var_.Broadcast();
 }
 
-template<typename MessageType>
-MessageType MessageQueue<MessageType>::GetMessage()
-{
+template <typename MessageType>
+MessageType MessageQueue<MessageType>::GetMessage() {
+  if (IsEmpty()) {
+    return MessageType();
+  }
   synchronization::AutoLock auto_lock(queue_lock_);
   MessageType message = queue_.front();
   queue_.pop();
   return message;
 }
 
-template<typename MessageType>
-void MessageQueue<MessageType>::WaitNewMessages()
-{
+template <typename MessageType>
+void MessageQueue<MessageType>::WaitNewMessages() {
   while (!IsFinalyzing() && queue_.empty()) {
-    new_messages_cond_var_.WaitFor(wait_lock_, new_messages_wait_default_timeout);
+    new_messages_cond_var_.WaitFor(queue_lock_,
+                                   new_messages_wait_default_timeout);
   }
 }
 
-template<typename MessageType>
-bool MessageQueue<MessageType>::IsFinalyzing() const
-{
+template <typename MessageType>
+bool MessageQueue<MessageType>::IsFinalyzing() const {
   return finalyzing_;
 }
 
-template<typename MessageType>
-void MessageQueue<MessageType>::Finalyze()
-{
+template <typename MessageType>
+void MessageQueue<MessageType>::Finalyze() {
   finalyzing_ = true;
 }
 
-template<typename MessageType>
-bool MessageQueue<MessageType>::IsEmpty() const
-{
+template <typename MessageType>
+bool MessageQueue<MessageType>::IsEmpty() const {
   return queue_.empty();
 }
 
-template<typename MessageType>
-MessageQueue<MessageType>::MessageQueue() : finalyzing_(false)
-{
+template <typename MessageType>
+MessageQueue<MessageType>::MessageQueue()
+    : finalyzing_(false) {}
 
-}
-
-template<typename MessageType>
-MessageQueue<MessageType>::~MessageQueue()
-{
+template <typename MessageType>
+MessageQueue<MessageType>::~MessageQueue() {
   Finalyze();
 }
-
 }

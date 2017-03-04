@@ -65,8 +65,8 @@ TEST_F(ServerMessageHandlerImplTest, Run_SeveralMessagesToServer_SendAll) {
       messages::Message(messages::MessageType::STOP_PROGRAM).ToRawData();
 
   EXPECT_CALL(*mock_socket_, Receive())
-      .WillOnce(ReturnRef(raw_empty_message))
-      .WillOnce(ReturnRef(raw_exit_message));
+      .WillOnce(Return(raw_empty_message))
+      .WillOnce(Return(raw_exit_message));
 
   EXPECT_CALL(*mock_socket_, Send(_)).Times(messages_count);
 
@@ -78,13 +78,14 @@ TEST_F(ServerMessageHandlerImplTest, Run_SeveralMessagesToServer_SendAll) {
 TEST_F(ServerMessageHandlerImplTest, Run_MoveFromServer_CorrectCall) {
   using namespace server_message_handler;
 
-  utils::ByteArray raw_move_message = messages::Message(messages::MessageType::MOVE).ToRawData();
+  utils::ByteArray raw_move_message =
+      messages::Message(messages::MessageType::MOVE).ToRawData();
   utils::ByteArray raw_exit_message =
       messages::Message(messages::MessageType::STOP_PROGRAM).ToRawData();
 
   EXPECT_CALL(*mock_socket_, Receive())
-      .WillOnce(ReturnRef(raw_move_message))
-      .WillOnce(ReturnRef(raw_exit_message));
+      .WillOnce(Return(raw_move_message))
+      .WillOnce(Return(raw_exit_message));
   EXPECT_CALL(mock_mover_, OnMoveMessageReceived(_));
 
   EXPECT_CALL(*mock_socket_, Send(_)).Times(0);
@@ -101,8 +102,8 @@ TEST_F(ServerMessageHandlerImplTest, Run_StartScanFromServer_CorrectCall) {
       messages::Message(messages::MessageType::STOP_PROGRAM).ToRawData();
 
   EXPECT_CALL(*mock_socket_, Receive())
-      .WillOnce(ReturnRef(raw_scan_message))
-      .WillOnce(ReturnRef(raw_exit_message));
+      .WillOnce(Return(raw_scan_message))
+      .WillOnce(Return(raw_exit_message));
   EXPECT_CALL(mock_scanner_, OnScanningTriggered());
 
   EXPECT_CALL(*mock_socket_, Send(_)).Times(0);

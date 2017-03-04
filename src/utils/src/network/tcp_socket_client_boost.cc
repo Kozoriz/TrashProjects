@@ -18,14 +18,15 @@ const utils::UInt max_buffer_size = 5u;
 const utils::UInt connect_waiting_timeout_ms = 5000u;
 }
 
-TcpSocketClient::TcpSocketClient(const utils::String& address, const UInt8 port)
+TcpSocketClient::TcpSocketClient(const utils::String& address, const UInt port)
     : address_(address), port_(port), boost_socket_(boost_io_service_) {
   LOG_AUTO_TRACE();
+  buffer_.resize(max_buffer_size);
 }
 
 TcpSocketClient::~TcpSocketClient() {
   LOG_AUTO_TRACE();
-  boost_socket_.close();
+  Deinit();
 }
 
 void TcpSocketClient::Init() {
@@ -33,20 +34,22 @@ void TcpSocketClient::Init() {
   EstabilishConnection();
 }
 
-void TcpSocketClient::Send(const ByteArray& message) {
+void TcpSocketClient::Deinit() {
   LOG_AUTO_TRACE();
-  boost::asio::write(boost_socket_,
-                     boost::asio::buffer(message, max_buffer_size));
+  boost_socket_.close();
+  boost_thread_ptr_->yield();
+  boost_thread_ptr_.reset();
 }
 
-const ByteArray& TcpSocketClient::Receive() {
+void TcpSocketClient::Send(const ByteArray& message) {
   LOG_AUTO_TRACE();
-  buffer_.clear();
-  const size_t data_size = boost::asio::read(
-      boost_socket_, boost::asio::buffer(buffer_, max_buffer_size));
-  LOG_DEBUG("Read socket data lenght : " << buffer_.size());
-  buffer_.resize(data_size);
-  return buffer_;
+  boost_io_service_.post(
+      boost::bind(&TcpSocketClient::WritingTask, this, message));
+}
+
+ByteArray TcpSocketClient::Receive() {
+  LOG_AUTO_TRACE();
+  return messages_from_server_.GetMessage();
 }
 
 void TcpSocketClient::EstabilishConnection() {
@@ -63,14 +66,77 @@ void TcpSocketClient::EstabilishConnection() {
     LOG_DEBUG("Trying to resolve : " << address_ << ":" << str_port);
     resolver_iterator = resolver.resolve(resolver_query, ec);
     if (tcp::resolver::iterator() != resolver_iterator) {
+      boost::asio::async_connect(
+          boost_socket_,
+          resolver_iterator,
+          boost::bind(&TcpSocketClient::OnConnetionEstablished,
+                      this,
+                      boost::asio::placeholders::error));
+      boost_thread_ptr_ = make_unique<boost::thread>(
+          boost::bind(&boost::asio::io_service::run, &boost_io_service_));
       break;
     }
     LOG_DEBUG("Resolving failed : " << ec.message() << ". Wait for : "
                                     << connect_waiting_timeout_ms);
     wait_cv.WaitFor(wait_lock, connect_waiting_timeout_ms);
   }
+}
 
-  boost::asio::connect(boost_socket_, resolver_iterator);
-  LOG_DEBUG("Client socket connected : " << address_ << ":" << str_port);
+void TcpSocketClient::OnConnetionEstablished(
+    const boost::system::error_code& error) {
+  LOG_AUTO_TRACE();
+  LOG_DEBUG("Client socket connected : " << address_ << ":" << port_);
+  SocketRead(error);
+}
+
+void TcpSocketClient::OnMessageReceived(
+    const boost::system::error_code& error) {
+  LOG_AUTO_TRACE();
+  if (!buffer_.empty()) {
+    LOG_DEBUG("Message received!");
+    messages_from_server_.PushMessage(buffer_);
+    buffer_.clear();
+    buffer_.resize(max_buffer_size);
+  }
+  SocketRead(error);
+}
+
+void TcpSocketClient::SocketRead(const boost::system::error_code& error) {
+  LOG_AUTO_TRACE();
+  if (!error) {
+    boost::asio::async_read(boost_socket_,
+                            boost::asio::buffer(buffer_, max_buffer_size),
+                            boost::bind(&TcpSocketClient::OnMessageReceived,
+                                        this,
+                                        boost::asio::placeholders::error));
+    return;
+  }
+  Deinit();
+}
+
+void TcpSocketClient::WritingTask(ByteArray message) {
+  LOG_AUTO_TRACE();
+  bool is_writing_in_progress = !messages_to_server_.IsEmpty();
+  messages_to_server_.PushMessage(message);
+  if (!is_writing_in_progress) {
+    SocketWrite(boost::system::error_code());
+  }
+}
+
+void TcpSocketClient::SocketWrite(const boost::system::error_code& error) {
+  LOG_AUTO_TRACE();
+  if (!error) {
+    if (!messages_to_server_.IsEmpty()) {
+      boost::asio::async_write(
+          boost_socket_,
+          boost::asio::buffer(messages_to_server_.GetMessage(),
+                              max_buffer_size),
+          boost::bind(&TcpSocketClient::SocketWrite,
+                      this,
+                      boost::asio::placeholders::error));
+    }
+    return;
+  }
+  Deinit();
 }
 }

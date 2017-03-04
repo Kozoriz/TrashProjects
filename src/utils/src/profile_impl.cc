@@ -21,7 +21,7 @@ void addOption(boost::program_options::options_description& options_description,
 
 void DebulLogAllProperties(
     const boost::program_options::variables_map& boost_var_map) {
-  LOG_ERROR(boost_var_map.size());
+  LOG_DEBUG("Properties read : " << boost_var_map.size());
   for (const auto& pair : boost_var_map) {
     utils::Stringstream debug_string;
     debug_string << "Property : " << pair.first.c_str();

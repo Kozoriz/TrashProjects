@@ -38,6 +38,7 @@ void LifeCycle::InitComponents() {
 
   message_handler_ = new server_message_handler::ServerMessageHandlerImpl(
       *mover_, *scanner_, *settings_);
+  scanner_->SetServerMessageHandler(message_handler_);
 }
 
 void LifeCycle::DeinitComponents() {
@@ -69,4 +70,8 @@ void LifeCycle::StartThreads() {
 int LifeCycle::ListenToServer() {
   LOG_AUTO_TRACE();
   message_handler_->Run();
+
+  // Stop program process
+  scanner_thread_->JoinThread();
+  mover_thread_->JoinThread();
 }

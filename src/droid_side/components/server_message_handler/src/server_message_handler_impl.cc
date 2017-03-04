@@ -34,7 +34,8 @@ ServerMessageHandlerImpl::~ServerMessageHandlerImpl() {
   }
 }
 
-void ServerMessageHandlerImpl::SendMessageToServer(const messages::Message* message) {
+void ServerMessageHandlerImpl::SendMessageToServer(
+    const messages::Message* message) {
   LOG_AUTO_TRACE();
   utils::synchronization::AutoLock auto_lock(messages_to_server_lock_);
   messages_to_server_.push(message);
@@ -45,7 +46,7 @@ void ServerMessageHandlerImpl::Run() {
   server_socket_connection_->Init();
   while (true) {
     utils::ByteArray raw_data;
-    while(true) {
+    while (true) {
       // Receiving from server
       raw_data.resize(0);
       raw_data = server_socket_connection_->Receive();
@@ -92,14 +93,14 @@ void ServerMessageHandlerImpl::Join() {}
 
 #if defined(BUILD_TESTS)
 utils::UInt ServerMessageHandlerImpl::get_messages_to_server_size() const {
-    return messages_to_server_.size();
+  return messages_to_server_.size();
 }
 
-void ServerMessageHandlerImpl::set_socket(utils::SocketClient *new_socket) {
-    if (server_socket_connection_) {
-        delete server_socket_connection_;
-    }
-    server_socket_connection_ = new_socket;
+void ServerMessageHandlerImpl::set_socket(utils::SocketClient* new_socket) {
+  if (server_socket_connection_) {
+    delete server_socket_connection_;
+  }
+  server_socket_connection_ = new_socket;
 }
 #endif
 

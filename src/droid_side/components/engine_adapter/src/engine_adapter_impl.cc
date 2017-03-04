@@ -50,10 +50,10 @@ void engine_adapter::EngineAdapterImpl::Run() {
         OnSpinDone();
         break;
       }
-      default:{
+      default: {
         OnSpinDone();
         break;
-    }
+      }
     }
   }
 }
