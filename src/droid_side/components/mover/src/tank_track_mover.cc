@@ -38,7 +38,6 @@ void mover::TankTrackMover::Run() {
   left_track_thread_.StartThread();
   right_track_thread_.StartThread();
   while (!finalizyng_) {
-    adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() + 1);
     messages::MoveMessage current_action;
     {
       // TODO investigate problem with deadlock found by UT(repeat > 50)
@@ -49,11 +48,13 @@ void mover::TankTrackMover::Run() {
       case messages::MoveType::MOVE_FORWARD: {
         Move(current_action.value());
         adapters_waiting_barrier_.Wait();
+        adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() + 1);
         break;
       }
       case messages::MoveType::ROTATE: {
         Rotate(current_action.value());
         adapters_waiting_barrier_.Wait();
+        adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() + 1);
         break;
       }
       default:

@@ -43,7 +43,7 @@ int LifeCycle::ListenToClient() {
 
   message_handler_->SendMessageToDroid(move);
   message_handler_->SendMessageToDroid(scan);
-//  message_handler_->SendMessageToDroid(stop);
+    message_handler_->SendMessageToDroid(stop);
 
   message_handler_->Run();
 }

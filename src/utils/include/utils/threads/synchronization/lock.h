@@ -13,8 +13,7 @@ class Lock {
   void Try();
 
  private:
-  std::mutex mutex_;
-  std::unique_lock<std::mutex> std_unique_lock_;
+  std::mutex std_mutex_;
   friend class ConditionalVariable;
   DISALLOW_COPY_AND_ASSIGN(Lock)
 };

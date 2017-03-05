@@ -7,10 +7,10 @@
 CREATE_LOGGER("DroneMessageHandler")
 
 namespace drone_message_handler {
-    namespace {
-    const utils::UInt process_messages_timeout = 1000u;
-    utils::UInt count = 0;
-    }
+namespace {
+const utils::UInt process_messages_timeout = 1000u;
+utils::UInt count = 0;
+}
 
 DroneMessageHandlerImpl::DroneMessageHandlerImpl(const utils::Profile& settings)
     : settings_(settings)
@@ -40,22 +40,20 @@ void DroneMessageHandlerImpl::Run() {
 
     utils::ByteArray raw_data;
     while (true) {
-      // Receiving from server
-      raw_data.resize(0);
       raw_data = socket_->Receive();
-      if (0 == raw_data.size()) {
+      if (raw_data.empty()) {
         break;
       }
       messages::Message message(raw_data);
       switch (message.type()) {
-      case messages::MessageType::SENSOR_DATA : {
+        case messages::MessageType::SENSOR_DATA: {
           LOG_DEBUG("Sensor data received." << ++count);
           break;
-      }
+        }
         default: {
           LOG_WARN("Unknown message type received!");
           break;
-      }
+        }
       }
     }
 

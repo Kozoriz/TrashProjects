@@ -69,7 +69,6 @@ void scanner::ScannerImpl::Run() {
                                              << current_position_.beta_ << "="
                                              << distance);
           SendDataToServer(MakeServerMessage(distance, axelerometer_data));
-//          usleep(100000);
           y_rotator_.ChangeAngle(1u);
         }
         x_rotator_.ChangeAngle(1u);
