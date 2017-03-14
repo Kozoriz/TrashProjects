@@ -1,5 +1,6 @@
 INCLUDE_DIRECTORIES(
     include
+    ${APP_MAIN_DIR}/include
     )
 
 file(GLOB SOURCES src/*.cc)

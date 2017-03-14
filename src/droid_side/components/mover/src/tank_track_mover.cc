@@ -48,13 +48,15 @@ void mover::TankTrackMover::Run() {
       case messages::MoveType::MOVE_FORWARD: {
         Move(current_action.value());
         adapters_waiting_barrier_.Wait();
-        adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() + 1);
+        adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() +
+                                            1);
         break;
       }
       case messages::MoveType::ROTATE: {
         Rotate(current_action.value());
         adapters_waiting_barrier_.Wait();
-        adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() + 1);
+        adapters_waiting_barrier_.set_count(settings_.mover_adapters_count() +
+                                            1);
         break;
       }
       default:

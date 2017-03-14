@@ -8,8 +8,8 @@ namespace positions {
  * @brief The Incline struct - angles cant be more than 359 = 9bits
  */
 struct Incline {
-  utils::UInt16 alpha_ = 0;
-  utils::UInt16 beta_ = 0;
+  utils::Int16 alpha_ = 0;
+  utils::Int16 beta_ = 0;
 };
 
 struct Location2 {

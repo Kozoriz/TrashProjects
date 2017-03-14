@@ -21,8 +21,7 @@ using namespace boost::asio::ip;
 
 TcpSocketServer::TcpSocketServer(const UInt16 port)
     : port_(port)
-    , boost_acceptor_(boost_io_service_, tcp::endpoint(tcp::v4(), port_))
-{
+    , boost_acceptor_(boost_io_service_, tcp::endpoint(tcp::v4(), port_)) {
   LOG_AUTO_TRACE();
 }
 
@@ -71,7 +70,9 @@ void TcpSocketServer::Init() {
 }
 
 TcpSocketServer::ClientSession::ClientSession(BoostSocketSPtr socket)
-    : socket_sptr_(socket), read_write_allowed_(false), reading_in_progress_(false) {
+    : socket_sptr_(socket)
+    , read_write_allowed_(false)
+    , reading_in_progress_(false) {
   LOG_AUTO_TRACE();
 }
 
@@ -88,7 +89,7 @@ void TcpSocketServer::ClientSession::WriteDataToSocket(
 const ByteArray& TcpSocketServer::ClientSession::ReadDataFromSocket() {
   LOG_AUTO_TRACE();
   if (!reading_in_progress_ && read_write_allowed_) {
-     SocketReadTask(boost::system::error_code());
+    SocketReadTask(boost::system::error_code());
   }
   return messages_from_client_.GetMessage();
 }
@@ -106,7 +107,7 @@ void TcpSocketServer::ClientSession::SocketWriteTask(
   LOG_AUTO_TRACE();
   if (!error) {
     if (read_write_allowed_ && !messages_to_client_.IsEmpty()) {
-        LOG_INFO("Writing socket data started");
+      LOG_INFO("Writing socket data started");
       boost::asio::async_write(
           *socket_sptr_,
           boost::asio::buffer(messages_to_client_.GetMessage(),

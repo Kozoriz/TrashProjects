@@ -2,18 +2,20 @@
 #include "utils/logger.h"
 #include "utils/network/tcp_socket_server.h"
 
-#include "messages/move_message.h"
+#include "messages/message.h"
+#include "messages/sensor_data_message.h"
 
 CREATE_LOGGER("DroneMessageHandler")
 
 namespace drone_message_handler {
 namespace {
 const utils::UInt process_messages_timeout = 1000u;
-utils::UInt count = 0;
 }
 
-DroneMessageHandlerImpl::DroneMessageHandlerImpl(const utils::Profile& settings)
+DroneMessageHandlerImpl::DroneMessageHandlerImpl(
+    const utils::Profile& settings, MessageListener& message_listener)
     : settings_(settings)
+    , message_listener_(message_listener)
     , socket_(new utils::TcpSocketServer(settings_.server_port()))
     , finalyzing_(false) {
   LOG_AUTO_TRACE();
@@ -47,7 +49,12 @@ void DroneMessageHandlerImpl::Run() {
       messages::Message message(raw_data);
       switch (message.type()) {
         case messages::MessageType::SENSOR_DATA: {
-          LOG_DEBUG("Sensor data received." << ++count);
+          messages::SensorDataMessage sd_message(raw_data);
+          if (sd_message.IsFinal()) {
+            message_listener_.OnFinalMessageReceived();
+          } else {
+            message_listener_.OnDataMessageReceived(sd_message);
+          }
           break;
         }
         default: {

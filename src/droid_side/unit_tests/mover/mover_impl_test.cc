@@ -40,8 +40,10 @@ class MoverImplTest : public ::testing::Test {
 
     EXPECT_CALL(left_ea_, Run());
     EXPECT_CALL(right_ea_, Run());
-    EXPECT_CALL(left_ea_, Join());
-    EXPECT_CALL(right_ea_, Join());
+    // 3 because in case stopping will be called manually
+    // and in JoinThread and from destructor Join again
+    EXPECT_CALL(left_ea_, Join()).Times(3);
+    EXPECT_CALL(right_ea_, Join()).Times(3);
   }
   ~MoverImplTest() {
     delete mover_thread_;

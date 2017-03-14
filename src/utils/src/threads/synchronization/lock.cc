@@ -3,10 +3,10 @@
 utils::synchronization::Lock::Lock() {}
 
 void utils::synchronization::Lock::Acquire() {
-    std_mutex_.lock();
+  std_mutex_.lock();
 }
 void utils::synchronization::Lock::Release() {
-    std_mutex_.unlock();
+  std_mutex_.unlock();
 }
 
 void utils::synchronization::Lock::Try() {

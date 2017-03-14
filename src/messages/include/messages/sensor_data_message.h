@@ -40,6 +40,18 @@ class SensorDataMessage : public Message {
     sensor_position_.beta_ = static_cast<utils::UInt16>(raw_data_array_[4]);
   }
 
+  bool IsFinal() const {
+    return final_message_;
+  }
+
+  utils::UInt16 GetDistance() const {
+    return distance_;
+  }
+
+  const utils::positions::Incline& GetIncline() const {
+    return sensor_position_;
+  }
+
  protected:
   bool final_message_;
   utils::UInt16 distance_;
