@@ -1,6 +1,6 @@
 #include "utils/logger.h"
 
-#include "life_cycle.h"
+#include "app_main/life_cycle.h"
 
 int main(int argc, char** argv) {
   logger::LoggerAutoPtr logger;

@@ -1,12 +1,15 @@
 
+set(APP_MAIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/app_main)
+
 add_subdirectory(components)
 
 set(ServerExecutable ${PROJECT}_Server)
 
 include_directories(
+  ${APP_MAIN_DIR}/include
   ${UTILS_INCLUDE_PATH}
   ${COMPONENTS_DIR}/include
-  ${COMPONENTS_DIR}/drone_messsage_handler/include
+  ${COMPONENTS_DIR}/drone_message_handler/include
   ${COMPONENTS_DIR}/drone_mover/include
   ${COMPONENTS_DIR}/guide/include
   ${COMPONENTS_DIR}/map_assembler/include
@@ -14,10 +17,7 @@ include_directories(
   ${COMPONENTS_DIR}/snapshot_processor/include
 )
 
-set(SOURCES
-	main.cc
-  life_cycle.cc
-)
+file(GLOB SOURCES ${APP_MAIN_DIR}/src/*)
 
 set(LIBRARIES
     Utils
@@ -45,5 +45,5 @@ enviroment_scanner_server.ini
 
 file(COPY ${INSTAL_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-install(TARGETS ${ServerExecutable} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
-install(FILES ${INSTAL_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
+install(TARGETS ${ServerExecutable} DESTINATION ${INSTALL_DIR}/bin/server_side)
+install(FILES ${INSTAL_FILES} DESTINATION ${INSTALL_DIR}/bin/server_side)
