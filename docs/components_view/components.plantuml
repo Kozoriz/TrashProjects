@@ -14,13 +14,15 @@ node ServerSide {
 	[MapDetalizationAnalyzer] as MDA
 	[Guide] as G
 	[DroneMover] as DM
+	[LifeCycle] as LC
 
-	SP -up-o DMH
-	SP --o MA
-	MA --o MDA
-	MDA --o G
-	G --o DM	
-	DM -up-o DMH
+	LC --* DMH
+	DMH --o LC
+	LC --* SP
+	LC --* MA
+	LC --* MDA
+	LC --* G
+	LC --* DM
 }
 
 node DroneSide {

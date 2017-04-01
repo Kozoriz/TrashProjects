@@ -3,25 +3,32 @@ scale max 1024*768
 
 [->DroneMessageHandler : "receive message"
 
-DroneMessageHandler --> SnapshotProcessor : addMessageToQueue
-SnapshotProcessor --> SnapshotProcessor : handle
 alt sensors data package	
-	SnapshotProcessor --> SnapshotProcessor : convertRawDataToPoint
+	DroneMessageHandler --> LifeCycle : OnDataMessageReceived
+	LifeCycle --> SnapshotProcessor : OnMessageReceived
+	SnapshotProcessor --> SnapshotProcessor : "calculate and save message internally"
 else end sensor data package
-	SnapshotProcessor --> SnapshotProcessor : finalyzeShanpshot
-	SnapshotProcessor --> MapAssembler : OnSnapshotGenerated
-	MapAssembler --> MapAssembler : processSnapshot
-	MapAssembler --> MapDetalzationAnalyzer : OnMapUpdated
-	MapDetalzationAnalyzer --> MapDetalzationAnalyzer : recalculateDetalizationPositions
-	MapDetalzationAnalyzer --> Guide : OnPositionsUpdated
-	Guide --> DroneMover : getCurrentPosition
-	Guide --> Guide : findNearestDetalizationPoint
-	Guide --> Guide : generateWay
-	Guide --> DroneMover : addCheckpointsToMoveQueue
-	DroneMover --> DroneMover : handle
-	DroneMover --> DroneMover : gotCheckpoint
-	DroneMover --> DroneMover : generateDroneCommands
-	DroneMover --> DroneMessageHandler : putMessageToQueueForSend
+	DroneMessageHandler --> LifeCycle : OnFinalMessageReceived
+	LifeCycle --> SnapshotProcessor : GetGeneratedSnapshot
+
+	LifeCycle --> MapAssembler : ProcessNewSnapshot
+	MapAssembler --> MapAssembler : "add snapshot to global map"
+	LifeCycle --> MapAssembler : GetCurrentMap
+
+	LifeCycle --> MapDetalzationAnalyzer : RecalculateDetalizationPositions
+	LifeCycle --> MapDetalzationAnalyzer : GetPositions
+
+	LifeCycle --> DroneMover : GetCurrentPosition
+	LifeCycle --> Guide : CalculateWayPoints(cur_pos, det_points)
+
+	LifeCycle --> DroneMover : GenerateMoveSequence(w_p)
+
+	loop move_sequence.size() 
+		LifeCycle --> DroneMessageHandler : SendMessageToDroid(m_s)
+	end
+
+	LifeCycle --> DroneMessageHandler : SendMessageToDroid(start_scan)
+	LifeCycle --> SnapshotProcessor : ClearSnapshot
 end
 
 @enduml
