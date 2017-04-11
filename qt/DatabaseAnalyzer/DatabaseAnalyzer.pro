@@ -1,18 +1,21 @@
 TEMPLATE = app
 
-QT += gui widgets
-LIBS += -lsqlite3
+QT += gui widgets sql
+#LIBS += -lsqlite3
+
 
 SOURCES += main.cpp \
     hight_level/databasereporter.cpp \
     hight_level/databaseanalyzer.cpp \
-    low_level/databasewrapper.cpp \
+    low_level/databasewrapper_postgre.cpp \
+#    low_level/databasewrapper_sqlite.cpp \
     data_types/table.cpp \
     data_types/tablerow.cpp \
     data_types/string.cpp \
     data_types/number.cpp \
     logger.cpp \
-    low_level/sql_query.cc \
+    low_level/sql_query_postgre.cc \
+#    low_level/sql_query_sqlite.cc \
     mainwindow.cpp \
     filterdialog.cpp
 

@@ -14,7 +14,18 @@ Table::Rows& operator+=(Table::Rows& a, const Table::Rows& b) {
 DatabaseAnalyzer::DatabaseAnalyzer()
     : table_(), current_filtered_table_(), db_wrapper_(table_) {
   LOG_MESSAGE("DatabaseAnalyzer::DatabaseAnalyzer");
+  ProcessTableList();
 }
+
+void DatabaseAnalyzer::ProcessTableList() {
+    LOG_MESSAGE("DatabaseAnalyzer::ProcessTableLis");
+    tables_list_ = db_wrapper_.GetTableList();
+}
+const std::vector<std::string>& DatabaseAnalyzer::GetTableList() const {
+    LOG_MESSAGE("DatabaseAnalyzer::GetTableList");
+    return tables_list_;
+}
+
 
 void DatabaseAnalyzer::ImportData(const std::string& db_name) {
   db_wrapper_.ImportData(db_name);
@@ -46,6 +57,7 @@ void DatabaseAnalyzer::OnCellChanged(const int row,
 
   changed_row.UpdateCellValue(column, data);
 
+  current_filtered_table_.UpdateRowById(id, changed_row);
   table_.UpdateRowById(id, changed_row);
 }
 

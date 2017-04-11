@@ -12,5 +12,10 @@ bool String::operator==(const std::string& other) const {
 }
 
 std::string String::asString() const {
-  return data;
+    return data;
+}
+
+std::string String::trim() const
+{
+    return data.substr(data.find_first_not_of(' '), data.find_last_not_of(' ') + 1);
 }

@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "data_types/table.h"
 #include "low_level/databasewrapper.h"
@@ -30,9 +31,13 @@ class DatabaseAnalyzer {
 
   void OnCellChanged(const int row, const int column, const std::string& data);
 
- private:
+  void ProcessTableList();
+  const std::vector<std::string> &GetTableList() const;
+private:
   Table table_;
   Table current_filtered_table_;
+
+  std::vector<std::string> tables_list_;
 
   DatabaseWrapper db_wrapper_;
 };

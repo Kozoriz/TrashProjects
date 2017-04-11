@@ -10,6 +10,7 @@ class String : public PrimitiveType {
 
   bool operator==(const std::string& other) const override;
   std::string asString() const override;
+  std::string trim() const;
 
  public:
   const std::string data;

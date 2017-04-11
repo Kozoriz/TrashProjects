@@ -13,6 +13,9 @@ bool Number::operator==(const std::string& other) const {
 }
 
 std::string Number::asString() const {
+  if (static_cast<int64_t>(data * 1000.f) % 1000 == 0) {
+    return std::to_string(int64_t(data));
+  }
   return std::to_string(data);
 }
 

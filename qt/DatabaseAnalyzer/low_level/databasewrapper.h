@@ -1,13 +1,21 @@
 #ifndef DATABASEWRAPPER_H
 #define DATABASEWRAPPER_H
 
-#include <sqlite3.h>
+//#include <sqlite3.h>
+
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
 
 #include "data_types/table.h"
+
+typedef QSqlDatabase DatabaseType;
+typedef QSqlQuery QueryType;
+//typedef sqlite3 DatabaseType;
 
 class DatabaseWrapper {
  public:
   DatabaseWrapper(Table& table);
+  ~DatabaseWrapper();
 
   /**
    * @brief ImportData - open sql connection, read data, write data to table
@@ -21,20 +29,24 @@ class DatabaseWrapper {
    */
   void ExportData();
 
-  sqlite3* conn() const;
+  DatabaseType* conn() const;
 
   std::string database_name_;
 
- private:
+  std::vector<std::string> GetTableList();
+private:
   bool Open();
   void Close();
   bool Exec(const std::string& query);
 
  private:
   Table& table_;
+  std::string current_table_name;
 
-  sqlite3* conn_;
+  DatabaseType* conn_;
   int error_;
+
+  QueryType last_query_;
 };
 
 #endif  // DATABASEWRAPPER_H

@@ -17,13 +17,16 @@ class MainWindow : public QMainWindow {
   ~MainWindow();
   void OnFilterGenerated(const QMap<QString, QString>& q_filter);
 
- private slots:
+public slots:
+
+private slots:
   void Import();
   void Export();
   void Filter();
   void Report();
   void ShowErrors();
   void OnCellChanged(int row, int column);
+  void OnTableChanged(const QString & new_value);
 
  private:
   Ui::MainWindow* ui;

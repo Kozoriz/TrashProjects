@@ -16,7 +16,7 @@ void TableRow::InsertCellValue(const std::string& col,
   if (Number::CanBeNum(value)) {
     data = new Number(value);
   } else {
-    data = new String(value);
+    data = new String(String(value).trim());
   }
   TableRow::RowData::value_type pair(col, data);
   data_.insert(pair);

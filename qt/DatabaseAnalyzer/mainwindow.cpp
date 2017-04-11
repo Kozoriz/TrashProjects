@@ -48,10 +48,30 @@ MainWindow::MainWindow(QWidget* parent)
   ui->actionSave->setEnabled(false);
   ui->actionGenerate_Repor->setEnabled(false);
   ui->actionShowErrors->setEnabled(false);
+
+
+  /// NEW
+  const std::vector<std::string>& table_list = analyzer_.GetTableList();
+
+  LOG_MESSAGE("MainWindow::MainWindow::table got");
+  for (auto str : table_list) {
+    LOG_MESSAGE("MainWindow::MainWindow add " + str);
+    ui->tables_combo_box->addItem(str.c_str());
+  }
+  connect(ui->tables_combo_box, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnTableChanged(const QString&)));
 }
 
 MainWindow::~MainWindow() {
   delete ui;
+}
+
+void MainWindow::OnTableChanged(const QString& new_value) {
+    LOG_MESSAGE("MainWindow::OnTableChanged");
+    analyzer_.ImportData(new_value.toStdString());
+    const Table& table = analyzer_.GetData();
+
+    FillUITable(ui->tableWidget, table);
+    ui->actionSave->setEnabled(true);
 }
 
 void MainWindow::Import() {
@@ -119,11 +139,6 @@ void MainWindow::FillUITable(QTableWidget* ui_table, const Table& data_table) {
       }
     }
   }
-
-  ui->actionFilter->setEnabled(true);
-  ui->actionGenerate_Repor->setEnabled(true);
-  ui->actionShowErrors->setEnabled(true);
-  ui->actionSave->setEnabled(true);
 }
 
 void MainWindow::OnFilterGenerated(const QMap<QString, QString>& q_filter) {
