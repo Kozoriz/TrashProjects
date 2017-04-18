@@ -26,6 +26,8 @@ class MessageQueue {
   MessageQueue();
   ~MessageQueue();
 
+  size_t Size() const;
+
  private:
   Queue<MessageType> queue_;
   synchronization::Lock queue_lock_;
@@ -87,5 +89,11 @@ MessageQueue<MessageType>::MessageQueue()
 template <typename MessageType>
 MessageQueue<MessageType>::~MessageQueue() {
   Finalyze();
+}
+
+template<typename MessageType>
+size_t MessageQueue<MessageType>::Size() const
+{
+  return queue_.size();
 }
 }

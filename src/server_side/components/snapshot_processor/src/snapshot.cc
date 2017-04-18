@@ -8,9 +8,8 @@
 CREATE_LOGGER("SnapshotPorcessor")
 
 namespace snapshot_processor {
-    const utils::Byte point_existence_value = 1u;
 void Snapshot::AddPoint(const utils::positions::Location3& point) {
-    LOG_AUTO_TRACE();
+  LOG_AUTO_TRACE();
   utils::Byte octal_byte = 0;
   if (point.x_ < 0) {
     octal_byte &= 0x01;
@@ -32,48 +31,57 @@ void Snapshot::AddPoint(const utils::positions::Location3& point) {
 
   switch (static_cast<Octal>(octal_byte)) {
     case Octal::I: {
-      LOG_DEBUG("Location : " << stringified_location << " added to I quadrant");
-      I_quadrant.SetValue(x_pos, y_pos, z_pos, point_existence_value);
+      LOG_DEBUG("Location : " << stringified_location
+                              << " added to I quadrant");
+      I_quadrant.AddPoint(x_pos, y_pos, z_pos);
       break;
     }
     case Octal::II: {
-      LOG_DEBUG("Location : " << stringified_location << " added to II quadrant");
-      II_quadrant.SetValue(x_pos, y_pos, z_pos, point_existence_value);
+      LOG_DEBUG("Location : " << stringified_location
+                              << " added to II quadrant");
+      II_quadrant.AddPoint(x_pos, y_pos, z_pos);
       break;
     }
     case Octal::III: {
-      LOG_DEBUG("Location : " << stringified_location << " added to II quadrant");
-      III_quadrant.SetValue(x_pos, y_pos, z_pos, point_existence_value);
+      LOG_DEBUG("Location : " << stringified_location
+                              << " added to II quadrant");
+      III_quadrant.AddPoint(x_pos, y_pos, z_pos);
       break;
     }
     case Octal::IV: {
-      LOG_DEBUG("Location : " << stringified_location << " added to IV quadrant");
-      IV_quadrant.SetValue(x_pos, y_pos, z_pos, point_existence_value);
+      LOG_DEBUG("Location : " << stringified_location
+                              << " added to IV quadrant");
+      IV_quadrant.AddPoint(x_pos, y_pos, z_pos);
       break;
     }
     case Octal::V: {
-      LOG_DEBUG("Location : " << stringified_location << " added to V quadrant");
-      V_quadrant.SetValue(x_pos, y_pos, z_pos, point_existence_value);
+      LOG_DEBUG("Location : " << stringified_location
+                              << " added to V quadrant");
+      V_quadrant.AddPoint(x_pos, y_pos, z_pos);
       break;
     }
     case Octal::VI: {
-      LOG_DEBUG("Location : " << stringified_location << " added to VI quadrant");
-      VI_quadrant.SetValue(x_pos, y_pos, z_pos, point_existence_value);
+      LOG_DEBUG("Location : " << stringified_location
+                              << " added to VI quadrant");
+      VI_quadrant.AddPoint(x_pos, y_pos, z_pos);
       break;
     }
     case Octal::VII: {
-      LOG_DEBUG("Location : " << stringified_location << " added to VII quadrant");
-      VII_quadrant.SetValue(x_pos, y_pos, z_pos, point_existence_value);
+      LOG_DEBUG("Location : " << stringified_location
+                              << " added to VII quadrant");
+      VII_quadrant.AddPoint(x_pos, y_pos, z_pos);
       break;
     }
     case Octal::VIII: {
-      LOG_DEBUG("Location : " << stringified_location << " added to VIII quadrant");
-      VIII_quadrant.SetValue(x_pos, y_pos, z_pos, point_existence_value);
+      LOG_DEBUG("Location : " << stringified_location
+                              << " added to VIII quadrant");
+      VIII_quadrant.AddPoint(x_pos, y_pos, z_pos);
       break;
     }
     default: {
       LOG_ERROR("Can`t to identify quadrant for : " << stringified_location);
-      break; }
+      break;
+    }
   }
 }
 }  // namespace snapshot_processor

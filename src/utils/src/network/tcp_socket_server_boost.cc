@@ -86,7 +86,7 @@ void TcpSocketServer::ClientSession::WriteDataToSocket(
   }
 }
 
-const ByteArray& TcpSocketServer::ClientSession::ReadDataFromSocket() {
+const ByteArray TcpSocketServer::ClientSession::ReadDataFromSocket() {
   LOG_AUTO_TRACE();
   if (!reading_in_progress_ && read_write_allowed_) {
     SocketReadTask(boost::system::error_code());
@@ -128,6 +128,7 @@ void TcpSocketServer::ClientSession::SocketReadTask(
     if (!buffer_.empty()) {
       LOG_INFO("Message received.");
       messages_from_client_.PushMessage(buffer_);
+      LOG_DEBUG("Messages from client size " << messages_from_client_.Size());
       buffer_.clear();
     }
     buffer_.resize(max_buffer_size);

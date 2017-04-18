@@ -66,6 +66,8 @@ void DroneMessageHandlerImpl::Run() {
 
     utils::synchronization::Lock wait_lock;
     utils::synchronization::ConditionalVariable wait_cv;
+    LOG_DEBUG("Waiting next cycle for " << process_messages_timeout
+                                        << "milliseconds.");
     wait_cv.WaitFor(wait_lock, process_messages_timeout);
   }
 }

@@ -69,6 +69,11 @@ void LifeCycle::StartThreads() {
 
 int LifeCycle::ListenToServer() {
   LOG_AUTO_TRACE();
+  message_handler_->SendMessageToServer(
+      new messages::SensorDataMessage(1, utils::positions::Incline()));
+  message_handler_->SendMessageToServer(
+      new messages::SensorDataMessage(1, utils::positions::Incline(), true));
+
   message_handler_->Run();
 
   // Stop program process

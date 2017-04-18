@@ -85,6 +85,8 @@ void ServerMessageHandlerImpl::Run() {
         delete message;
       }
     }
+    LOG_DEBUG("Waiting next cycle for " << process_messages_timeout
+                                        << " miliseconds.");
     wait_cond_var_.WaitFor(wait_lock_, process_messages_timeout);
   }
 }

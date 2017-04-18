@@ -33,7 +33,7 @@ class TcpSocketServer : public SocketServer {
    public:
     ClientSession(BoostSocketSPtr socket);
     void WriteDataToSocket(const ByteArray& message);
-    const ByteArray& ReadDataFromSocket();
+    const ByteArray ReadDataFromSocket();
     void AllowTransmmitting(const bool is_accepted);
 
    private:

@@ -61,6 +61,13 @@ void LifeCycle::OnDataMessageReceived(
 
 void LifeCycle::OnFinalMessageReceived() {
   LOG_AUTO_TRACE();
-  snapshot_processor_->GetGeneratedSnapshot();
+  LOG_DEBUG("Getting snapshot.");
+  const snapshot_processor::Snapshot& snapshot =
+      snapshot_processor_->GetGeneratedSnapshot();
+  map_assembler_->AttachSnapshotToMap(snapshot);
+  map_assembler_->GetActualMap();
   // and call all components in sequence
+
+  // Clear snapshot in the end
+  snapshot_processor_->ClearSnapshot();
 }

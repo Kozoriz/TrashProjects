@@ -27,21 +27,21 @@ class Snapshot {
 
  private:
   // X>0 Y>0 Z>0
-  utils::structures::Matrix3<utils::Byte> I_quadrant;
+  utils::structures::Matrix3 I_quadrant;
   // X<0
-  utils::structures::Matrix3<utils::Byte> II_quadrant;
+  utils::structures::Matrix3 II_quadrant;
   // X<0 Y<0
-  utils::structures::Matrix3<utils::Byte> III_quadrant;
+  utils::structures::Matrix3 III_quadrant;
   // Y<0
-  utils::structures::Matrix3<utils::Byte> IV_quadrant;
+  utils::structures::Matrix3 IV_quadrant;
   // Z<0 (under I)
-  utils::structures::Matrix3<utils::Byte> V_quadrant;
+  utils::structures::Matrix3 V_quadrant;
   // X<0 Z<0 (under II)
-  utils::structures::Matrix3<utils::Byte> VI_quadrant;
+  utils::structures::Matrix3 VI_quadrant;
   // X<0 Y<0 Z<0 (under III)
-  utils::structures::Matrix3<utils::Byte> VII_quadrant;
+  utils::structures::Matrix3 VII_quadrant;
   // Y<0 Z<0 (under IV)
-  utils::structures::Matrix3<utils::Byte> VIII_quadrant;
+  utils::structures::Matrix3 VIII_quadrant;
 };
 
 }  // namespace snapshot_processor
