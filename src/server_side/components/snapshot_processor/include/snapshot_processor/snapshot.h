@@ -2,8 +2,11 @@
 
 #include "utils/structures/position.h"
 #include "utils/structures/matrix3.h"
+#include "utils/pointers/unique_ptr.h"
+#include "utils/pointers/shared_prt.h"
 
 namespace snapshot_processor {
+typedef utils::UniquePtr<utils::structures::Matrix3> QuadrantSPtr;
 enum class Octal {
   // (1 if <0)
   // z,y,x = 000
@@ -23,25 +26,30 @@ enum class Octal {
  */
 class Snapshot {
  public:
+  Snapshot();
   void AddPoint(const utils::positions::Location3& point);
+  void Clear();
+  const utils::structures::Matrix3& GetQuadrant(Octal octal);
 
  private:
   // X>0 Y>0 Z>0
-  utils::structures::Matrix3 I_quadrant;
+  QuadrantSPtr I_quadrant;
   // X<0
-  utils::structures::Matrix3 II_quadrant;
+  QuadrantSPtr II_quadrant;
   // X<0 Y<0
-  utils::structures::Matrix3 III_quadrant;
+  QuadrantSPtr III_quadrant;
   // Y<0
-  utils::structures::Matrix3 IV_quadrant;
+  QuadrantSPtr IV_quadrant;
   // Z<0 (under I)
-  utils::structures::Matrix3 V_quadrant;
+  QuadrantSPtr V_quadrant;
   // X<0 Z<0 (under II)
-  utils::structures::Matrix3 VI_quadrant;
+  QuadrantSPtr VI_quadrant;
   // X<0 Y<0 Z<0 (under III)
-  utils::structures::Matrix3 VII_quadrant;
+  QuadrantSPtr VII_quadrant;
   // Y<0 Z<0 (under IV)
-  utils::structures::Matrix3 VIII_quadrant;
+  QuadrantSPtr VIII_quadrant;
 };
+
+typedef utils::SharedPtr<Snapshot> SnapshotSPtr;
 
 }  // namespace snapshot_processor

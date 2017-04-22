@@ -62,9 +62,13 @@ void LifeCycle::OnDataMessageReceived(
 void LifeCycle::OnFinalMessageReceived() {
   LOG_AUTO_TRACE();
   LOG_DEBUG("Getting snapshot.");
-  const snapshot_processor::Snapshot& snapshot =
+  utils::SharedPtr<snapshot_processor::Snapshot> snapshot =
       snapshot_processor_->GetGeneratedSnapshot();
-  map_assembler_->AttachSnapshotToMap(snapshot);
+
+  const utils::positions::Location3& drone_dislocation =
+      guide_->GetDroneLocation();
+
+  map_assembler_->AttachSnapshotToMap(snapshot, drone_dislocation);
   map_assembler_->GetActualMap();
   // and call all components in sequence
 

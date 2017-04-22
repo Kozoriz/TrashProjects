@@ -1,15 +1,16 @@
 #pragma once
 
-namespace snapshot_processor {
-class Snapshot;
-}
+#include "snapshot_processor/snapshot.h"
+#include "utils/pointers/shared_prt.h"
+#include "utils/structures/matrix3.h"
 
 namespace map_assembler {
-class Map;
+typedef utils::structures::Matrix3 Map;
 class MapAssembler {
  public:
   virtual void AttachSnapshotToMap(
-      const snapshot_processor::Snapshot& snapshot) = 0;
+      utils::SharedPtr<snapshot_processor::Snapshot> snapshot,
+      utils::positions::Location3 dislocation) = 0;
   virtual const Map& GetActualMap() const = 0;
 };
 }

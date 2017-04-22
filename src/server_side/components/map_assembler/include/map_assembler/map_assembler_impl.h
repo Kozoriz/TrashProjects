@@ -8,10 +8,15 @@ class MapAssemblerImpl : public MapAssembler {
   ~MapAssemblerImpl();
 
   void AttachSnapshotToMap(
-      const snapshot_processor::Snapshot& snapshot) override;
+      utils::SharedPtr<snapshot_processor::Snapshot> snapshot,
+      utils::positions::Location3 dislocation) override;
   const Map& GetActualMap() const override;
 
  private:
+  void NormalizeGlobalMap();
+
+ private:
   const utils::Profile& settings_;
+  Map storage_;
 };
 }  // namespace map_assembler

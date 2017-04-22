@@ -7,12 +7,13 @@ namespace snapshot_processor {
 SnapshotProcessorImpl::SnapshotProcessorImpl(const utils::Profile& settings)
     : settings_(settings) {
   LOG_AUTO_TRACE();
+  snapshot_ = utils::make_shared<Snapshot>();
 }
 SnapshotProcessorImpl::~SnapshotProcessorImpl() {
   LOG_AUTO_TRACE();
 }
 
-const Snapshot& SnapshotProcessorImpl::GetGeneratedSnapshot() const {
+SnapshotSPtr SnapshotProcessorImpl::GetGeneratedSnapshot() const {
   LOG_AUTO_TRACE();
   return snapshot_;
 }
@@ -34,19 +35,20 @@ void SnapshotProcessorImpl::OnMessageReceived(
   const utils::Float a = static_cast<utils::Float>(90 - angles.beta_);
   const utils::Float b = static_cast<utils::Float>(angles.alpha_);
   const utils::Float radius = static_cast<utils::Float>(message.GetDistance());
-  LOG_DEBUG("Received data : R(" << radius << "), Alpha(" << a << "), Beta("
-                                 << b << ")");
+  LOG_DEBUG("Received data : R(" << radius << "), Colatitude(" << a
+                                 << "), Azimut(" << b << ")");
   utils::positions::Location3 point;
   // TODO wrap sin/cos in utils
   point.x_ = static_cast<utils::Int>(radius * std::sin(a) * std::cos(b));
   point.y_ = static_cast<utils::Int>(radius * std::sin(a) * std::sin(b));
   point.z_ = static_cast<utils::Int>(radius * std::cos(a));
 
-  snapshot_.AddPoint(point);
+  snapshot_->AddPoint(point);
 }
 
 void SnapshotProcessorImpl::ClearSnapshot() {
   LOG_AUTO_TRACE();
-  snapshot_ = Snapshot();
+  snapshot_->Clear();
+  LOG_DEBUG("Snapshot cleared.");
 }
 }
