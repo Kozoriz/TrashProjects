@@ -48,5 +48,5 @@ enviroment_scanner_client.ini
 
 file(COPY ${INSTAL_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-install(TARGETS ${ClientExecutable} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
-install(FILES ${INSTAL_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
+install(TARGETS ${ClientExecutable} DESTINATION ${INSTALL_DIR}/bin/droid_side)
+install(FILES ${INSTAL_FILES} DESTINATION ${INSTALL_DIR}/bin/droid_side)
