@@ -27,8 +27,10 @@ void LifeCycle::InitComponents() {
   axelerometer_ = new axelerometer_adapter::AxelerometerAdapterImpl();
 #endif
   sensor_ = new sensor_adapter::LidarLite3Adapter();
-  x_servo_ = new servo_adapter::ServoAdapterImpl();
-  y_servo_ = new servo_adapter::ServoAdapterImpl();
+  x_servo_ = new servo_adapter::ServoAdapterImpl(
+      servo_adapter::ServoAdapterImpl::HORIZONTAL);
+  y_servo_ = new servo_adapter::ServoAdapterImpl(
+      servo_adapter::ServoAdapterImpl::VERTICAL);
   scanner_ = new scanner::ScannerImpl(
       *sensor_, *x_servo_, *y_servo_, *axelerometer_, *settings_);
 
