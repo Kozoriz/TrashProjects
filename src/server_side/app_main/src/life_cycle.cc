@@ -12,6 +12,7 @@
 #include "drone_mover/drone_mover_impl.h"
 
 CREATE_LOGGER("Main")
+#include <stdlib.h>
 
 #include "messages/move_message.h"
 
@@ -50,6 +51,8 @@ void LifeCycle::StartThreads() {
 
 int LifeCycle::ListenToClient() {
   LOG_AUTO_TRACE();
+  message_handler_->SendMessageToDroid(new messages::Message(
+      messages::MessageType::START_SCAN));
   message_handler_->Run();
 }
 
@@ -62,15 +65,33 @@ void LifeCycle::OnDataMessageReceived(
 void LifeCycle::OnFinalMessageReceived() {
   LOG_AUTO_TRACE();
   LOG_DEBUG("Getting snapshot.");
+
   utils::SharedPtr<snapshot_processor::Snapshot> snapshot =
       snapshot_processor_->GetGeneratedSnapshot();
+  snapshot_processor_->SaveSnapshotFile();
 
   const utils::positions::Location3& drone_dislocation =
       guide_->GetDroneLocation();
 
   map_assembler_->AttachSnapshotToMap(snapshot, drone_dislocation);
-  map_assembler_->GetActualMap();
-  // and call all components in sequence
+  const map_assembler::Map& actual_map = map_assembler_->GetActualMap();
+  map_assembler_->SaveMapFile();
+
+  map_detalization_analyzer::PointsArray possible_analisation_points =
+      map_detalization_analyzer_->ProcessAnalisationPoints(actual_map);
+
+  guide::PointsArray way_points =
+      guide_->GetWayPointsToNearestLocation(possible_analisation_points);
+
+  utils::Vector<messages::MoveMessage*> move_messages =
+      drone_mover_->MakeMoveCommadns(drone_dislocation, way_points);
+
+  for (auto message : move_messages) {
+    message_handler_->SendMessageToDroid(message);
+  }
+
+  message_handler_->SendMessageToDroid(
+      new messages::Message(messages::MessageType::START_SCAN));
 
   // Clear snapshot in the end
   snapshot_processor_->ClearSnapshot();

@@ -11,8 +11,12 @@ class MapAssemblerImpl : public MapAssembler {
       utils::SharedPtr<snapshot_processor::Snapshot> snapshot,
       utils::positions::Location3 dislocation) override;
   const Map& GetActualMap() const override;
+  void SaveMapFile() const override;
 
  private:
+  /**
+   * @brief NormalizeGlobalMap - shifts map to Ist quadrant
+   */
   void NormalizeGlobalMap();
 
  private:

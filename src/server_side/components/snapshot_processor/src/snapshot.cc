@@ -23,13 +23,13 @@ void Snapshot::AddPoint(const utils::positions::Location3& point) {
   LOG_AUTO_TRACE();
   utils::Byte octal_byte = 0;
   if (point.x_ < 0) {
-    octal_byte &= 0x01;
+    octal_byte |= 0x01;
   }
   if (point.y_ < 0) {
-    octal_byte &= 0x02;
+    octal_byte |= 0x02;
   }
   if (point.z_ < 0) {
-    octal_byte &= 0x04;
+    octal_byte |= 0x04;
   }
 
   utils::UInt x_pos = std::abs(point.x_);
@@ -128,5 +128,15 @@ const utils::structures::Matrix3& Snapshot::GetQuadrant(Octal octal) {
     default:
       break;
   }
+}
+
+utils::positions::Location3 Snapshot::ShiftToOctal(
+    const utils::positions::Location3& point, Octal octal) {
+  utils::Int int_octal = static_cast<utils::Int>(octal);
+  utils::positions::Location3 temp = point;
+  temp.x_ *= (int_octal & 0x01) ? -1 : 1;
+  temp.y_ *= (int_octal & 0x02) ? -1 : 1;
+  temp.z_ *= (int_octal & 0x04) ? -1 : 1;
+  return temp;
 }
 }  // namespace snapshot_processor

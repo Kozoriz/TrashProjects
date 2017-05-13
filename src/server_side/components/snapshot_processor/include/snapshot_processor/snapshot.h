@@ -30,6 +30,8 @@ class Snapshot {
   void AddPoint(const utils::positions::Location3& point);
   void Clear();
   const utils::structures::Matrix3& GetQuadrant(Octal octal);
+  utils::positions::Location3 ShiftToOctal(
+      const utils::positions::Location3& point, Octal octal);
 
  private:
   // X>0 Y>0 Z>0

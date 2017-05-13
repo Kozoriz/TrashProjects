@@ -7,6 +7,7 @@ bool utils::threads::Thread::StartThread() {
   std_thread_unique_ptr_ =
       utils::make_unique<std::thread>(&Thread::ThreadMain, this);
   current_state_ = ThreadState::Runnung;
+  return true;
 }
 
 void utils::threads::Thread::JoinThread() {

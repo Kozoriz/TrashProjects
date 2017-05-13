@@ -12,5 +12,6 @@ class MapAssembler {
       utils::SharedPtr<snapshot_processor::Snapshot> snapshot,
       utils::positions::Location3 dislocation) = 0;
   virtual const Map& GetActualMap() const = 0;
+  virtual void SaveMapFile() const = 0;
 };
 }

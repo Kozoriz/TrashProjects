@@ -5,10 +5,10 @@
 
 namespace utils {
 namespace structures {
-  class Hash {
-  public:
-    size_t operator()(const positions::Location2& pos) const;
-  };
+class Hash {
+ public:
+  size_t operator()(const positions::Location2& pos) const;
+};
 
 /**
  * @brief The Matrix2 - saves values of x,y coordinates in horizontal projection

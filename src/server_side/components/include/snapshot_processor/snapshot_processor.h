@@ -11,5 +11,6 @@ class SnapshotProcessor {
   virtual void OnMessageReceived(
       const messages::SensorDataMessage& message) = 0;
   virtual void ClearSnapshot() = 0;
+  virtual void SaveSnapshotFile() const = 0;
 };
 }

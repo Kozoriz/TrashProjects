@@ -8,6 +8,10 @@ class DroneMoverImpl : public DroneMover {
   DroneMoverImpl(const utils::Profile& settings);
   ~DroneMoverImpl();
 
+  utils::Vector<messages::MoveMessage*> MakeMoveCommadns(
+      const utils::positions::Location3& drone_dislocation,
+      const utils::Vector<utils::positions::Location3>& way_points) override;
+
  private:
   const utils::Profile& settings_;
 };

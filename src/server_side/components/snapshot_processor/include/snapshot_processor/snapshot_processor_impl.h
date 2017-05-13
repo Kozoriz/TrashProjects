@@ -11,6 +11,7 @@ class SnapshotProcessorImpl : public SnapshotProcessor {
   SnapshotSPtr GetGeneratedSnapshot() const override;
   void OnMessageReceived(const messages::SensorDataMessage& message) override;
   void ClearSnapshot() override;
+  void SaveSnapshotFile() const override;
 
  private:
   const utils::Profile& settings_;

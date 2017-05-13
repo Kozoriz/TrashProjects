@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils/numbers.h"
+#include "utils/containers/string.h"
 
 namespace utils {
 namespace positions {
@@ -35,6 +36,12 @@ struct Location3 {
     temp.y_ = this->y_ + other.y_;
     temp.z_ = this->z_ + other.z_;
     return temp;
+  }
+
+  String ToString() const {
+    Stringstream ss;
+    ss << x_ << " " << y_ << " " << z_;
+    return ss.str();
   }
 };
 }

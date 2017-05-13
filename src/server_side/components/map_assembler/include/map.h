@@ -3,7 +3,7 @@
 
 namespace map_assembler {
 class Map {
-public:
+ public:
   void AddPoint(utils::positions::Location3& point) {
     storage_.AddPoint(point);
   }
@@ -13,6 +13,6 @@ public:
     // add to every point
   }
 
-private:
+ private:
   utils::structures::Matrix3 storage_;
 };

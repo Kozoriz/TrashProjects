@@ -33,11 +33,13 @@ void DroneMessageHandlerImpl::Run() {
   socket_->AcceptClient();
 
   while (!finalyzing_) {
-    utils::synchronization::AutoLock auto_lock(messages_lock_);
-    while (!messages_to_client_.IsEmpty()) {
-      const messages::Message* message = messages_to_client_.GetMessage();
-      socket_->Send(message->ToRawData());
-      delete message;
+    {
+      utils::synchronization::AutoLock auto_lock(messages_lock_);
+      while (!messages_to_client_.IsEmpty()) {
+        const messages::Message* message = messages_to_client_.GetMessage();
+        socket_->Send(message->ToRawData());
+        delete message;
+      }
     }
 
     utils::ByteArray raw_data;

@@ -1,6 +1,11 @@
 #include "map_assembler/map_assembler_impl.h"
+#include "utils/logger.h"
+#include "utils/containers/string.h"
 
+CREATE_LOGGER("MapAssembler")
 namespace map_assembler {
+namespace {}  // namespace
+
 MapAssemblerImpl::MapAssemblerImpl(const utils::Profile& settings)
     : settings_(settings) {}
 MapAssemblerImpl::~MapAssemblerImpl() {}
@@ -8,21 +13,30 @@ MapAssemblerImpl::~MapAssemblerImpl() {}
 void MapAssemblerImpl::AttachSnapshotToMap(
     utils::SharedPtr<snapshot_processor::Snapshot> snapshot,
     utils::positions::Location3 dislocation) {
+  LOG_AUTO_TRACE();
   for (int octal = 0; octal < 7; ++octal) {
     const utils::structures::Matrix3& quadrant =
         snapshot->GetQuadrant(static_cast<snapshot_processor::Octal>(octal));
     for (auto point : quadrant) {
-      storage_.AddPoint(point + dislocation);
+      utils::positions::Location3 temp = snapshot->ShiftToOctal(
+          point, static_cast<snapshot_processor::Octal>(octal));
+      storage_.AddPoint(temp + dislocation);
     }
   }
-  NormalizeGlobalMap();
+  LOG_DEBUG("SnapshotAttached");
+  //  Must be used only in case needed shifting map to first quadrant
+  //  NormalizeGlobalMap();
 }
 
 const Map& MapAssemblerImpl::GetActualMap() const {
+  LOG_AUTO_TRACE();
   return storage_;
 }
 
+void MapAssemblerImpl::SaveMapFile() const {}
+
 void MapAssemblerImpl::NormalizeGlobalMap() {
+  LOG_AUTO_TRACE();
   utils::Int min_x = 0;
   utils::Int min_y = 0;
   utils::Int min_z = 0;
@@ -39,6 +53,7 @@ void MapAssemblerImpl::NormalizeGlobalMap() {
                     min_z = point.z_;
                   }
                 });
+  // TODO shift all points for minimal values p.x_+abs(min_x)
 }
 
 }  // namespace map_assembler

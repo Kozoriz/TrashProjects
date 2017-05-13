@@ -9,6 +9,8 @@ class GuideImpl : public Guide {
   ~GuideImpl();
 
   const utils::positions::Location3& GetDroneLocation() override;
+  PointsArray GetWayPointsToNearestLocation(
+      const PointsArray& possible_analisation_points) override;
 
  private:
   const utils::Profile& settings_;

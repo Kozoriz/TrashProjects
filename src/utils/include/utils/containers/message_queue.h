@@ -91,9 +91,8 @@ MessageQueue<MessageType>::~MessageQueue() {
   Finalyze();
 }
 
-template<typename MessageType>
-size_t MessageQueue<MessageType>::Size() const
-{
+template <typename MessageType>
+size_t MessageQueue<MessageType>::Size() const {
   return queue_.size();
 }
 }
