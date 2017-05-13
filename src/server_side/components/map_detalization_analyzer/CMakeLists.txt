@@ -1,5 +1,6 @@
 INCLUDE_DIRECTORIES(
     include
+    ${COMPONENTS_DIR}/snapshot_processor/include
     )
 
 file(GLOB SOURCES src/*.cc)
