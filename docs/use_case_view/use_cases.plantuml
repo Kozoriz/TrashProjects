@@ -9,8 +9,7 @@ rectangle ServerSide {
 rectangle UI {
 	(Save data in readable format) as SDRF
 	
-	SDRF <|-- (Save as SCV)
-	SDRF <|-- (Save as sqlite)
+	SDRF <|-- (Save as CSV)
 
 	U --> (Start scannign process)
 	U --> (Stop scanning process)
