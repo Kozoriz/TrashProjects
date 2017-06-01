@@ -19,11 +19,12 @@ MmapWorker* MmapWorker::getInstance() {
 
 void MmapWorker::WriteNewStateToMap(const DroneAction act,
                                     const int32_t act_data) {
-    LOG_AUTO_TRACE();
+  LOG_AUTO_TRACE();
   if (pthread_mutex_lock(&(mmapData_->mutex_)) != 0) {
     LOG_ERROR("pthread_mutex_lock");
     return;
   }
+  LOG_INFO("Mutex locked");
 
   mmapData_->act_ = act;
   mmapData_->action_data_ = act_data;
@@ -32,10 +33,50 @@ void MmapWorker::WriteNewStateToMap(const DroneAction act,
     LOG_ERROR("pthread_mutex_unlock");
     return;
   }
+  LOG_INFO("Mutex unlocked");
   if (pthread_cond_signal(&(mmapData_->cond_)) != 0) {
     LOG_ERROR("pthread_cond_signal");
     return;
   }
+  LOG_INFO("Cond signaled");
+}
+
+int32_t MmapWorker::GetCurrentActData() {
+  LOG_AUTO_TRACE();
+  if (pthread_mutex_lock(&(mmapData_->mutex_)) != 0) {
+    LOG_ERROR("pthread_mutex_lock");
+    return -1;
+  }
+  LOG_INFO("Mutex locked");
+
+  int32_t current_act_data = mmapData_->action_data_;
+
+  if (pthread_mutex_unlock(&(mmapData_->mutex_)) != 0) {
+    LOG_ERROR("pthread_mutex_unlock");
+    return -1;
+  }
+  LOG_INFO("Mutex unlocked");
+
+  return current_act_data;
+}
+
+DroneAction MmapWorker::GetCurrentAct() {
+  LOG_AUTO_TRACE();
+  if (pthread_mutex_lock(&(mmapData_->mutex_)) != 0) {
+    LOG_ERROR("pthread_mutex_lock");
+    return DroneAction::STOP;
+  }
+  LOG_INFO("Mutex locked");
+
+  DroneAction current_act = mmapData_->act_;
+
+  if (pthread_mutex_unlock(&(mmapData_->mutex_)) != 0) {
+    LOG_ERROR("pthread_mutex_unlock");
+    return DroneAction::STOP;
+  }
+  LOG_INFO("Mutex unlocked");
+
+  return DroneAction::STOP;
 }
 
 MmapWorker::MmapWorker() {
@@ -45,9 +86,11 @@ MmapWorker::MmapWorker() {
   /* Create shared memory object and set its size */
   fd_mmapFile = open(mmapFilePath, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
   if (fd_mmapFile == -1) {
-    LOG_ERROR("fd error; check errno for details");
+    LOG_ERROR("Can`t to open mmap file");
     return;
   }
+
+  LOG_INFO("Mmap file open successfully");
 
   /* Map shared memory object read-writable */
   mmapData_ = static_cast<struct mmapData*>(mmap(NULL,
@@ -57,9 +100,11 @@ MmapWorker::MmapWorker() {
                                                  fd_mmapFile,
                                                  0));
   if (mmapData_ == MAP_FAILED) {
-    LOG_ERROR("mmap error");
+    LOG_ERROR("Pointer mapping error");
     return;
   }
+
+  LOG_INFO("Initial data pointer mapped successfully");
 }
 
 }  // namespace utils

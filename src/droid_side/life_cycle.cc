@@ -34,8 +34,10 @@ void LifeCycle::InitComponents() {
   scanner_ = new scanner::ScannerImpl(
       *sensor_, *x_servo_, *y_servo_, *axelerometer_, *settings_);
 
-  left_engine_ = new engine_adapter::EngineAdapterImpl();
-  right_engine_ = new engine_adapter::EngineAdapterImpl();
+  left_engine_ = new engine_adapter::EngineAdapterImpl(
+      engine_adapter::EngineAdapterImpl::Position::LEFT);
+  right_engine_ = new engine_adapter::EngineAdapterImpl(
+      engine_adapter::EngineAdapterImpl::Position::RIGHT);
   mover_ = new mover::TankTrackMover(*left_engine_, *right_engine_, *settings_);
 
   message_handler_ = new server_message_handler::ServerMessageHandlerImpl(

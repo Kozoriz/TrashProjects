@@ -4,6 +4,6 @@ namespace sensor_adapter {
 class LidarLite3Adapter : public SensorAdapter {
  public:
   LidarLite3Adapter();
-  utils::UInt GetSensorData() const override;
+  utils::Int GetSensorData() const override;
 };
 }

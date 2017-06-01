@@ -32,6 +32,8 @@ class MmapWorker {
  public:
   static MmapWorker* getInstance();
   void WriteNewStateToMap(const DroneAction act, const int32_t act_data);
+  int32_t GetCurrentActData();
+  DroneAction GetCurrentAct();
 
  private:
   MmapWorker();

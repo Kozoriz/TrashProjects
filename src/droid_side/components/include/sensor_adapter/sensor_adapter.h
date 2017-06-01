@@ -5,6 +5,6 @@
 namespace sensor_adapter {
 class SensorAdapter {
  public:
-  virtual utils::UInt GetSensorData() const = 0;
+  virtual utils::Int GetSensorData() const = 0;
 };
 }

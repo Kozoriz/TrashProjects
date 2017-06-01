@@ -3,11 +3,14 @@
 #include "utils/logger.h"
 
 #include "utils/logger.h"
+#include "utils/arduino_mmap_worker_singletone.h"
 
 CREATE_LOGGER("EngineAdapter")
 
-engine_adapter::EngineAdapterImpl::EngineAdapterImpl()
-    : finalyzing_(false), current_state_(Direction::STOP) {
+engine_adapter::EngineAdapterImpl::EngineAdapterImpl(const Position pos)
+    : finalyzing_(false)
+    , current_state_(Direction::STOP)
+    , engine_position_(pos) {
   LOG_AUTO_TRACE();
 }
 
@@ -73,6 +76,23 @@ void engine_adapter::EngineAdapterImpl::OnSpinDone() {
 void engine_adapter::EngineAdapterImpl::SpinForwardLowLevel(
     const utils::UInt milliseconds) const {
   LOG_AUTO_TRACE();
+  utils::DroneAction current_action =
+      utils::MmapWorker::getInstance()->GetCurrentAct();
+
+  if ((utils::DroneAction::LEFT_TRACK == current_action &&
+       Position::LEFT != engine_position_) ||
+      (utils::DroneAction::RIGHT_TRACK == current_action &&
+       Position::RIGHT != engine_position_)) {
+    utils::MmapWorker::getInstance()->WriteNewStateToMap(
+        utils::DroneAction::BOTH_TRACKS, milliseconds);
+    return;
+  }
+
+  utils::DroneAction result_action = (Position::LEFT == engine_position_)
+                                         ? utils::DroneAction::LEFT_TRACK
+                                         : utils::DroneAction::RIGHT_TRACK;
+  utils::MmapWorker::getInstance()->WriteNewStateToMap(result_action,
+                                                       milliseconds);
 }
 
 void engine_adapter::EngineAdapterImpl::SpinBackLowLevel(

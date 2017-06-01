@@ -10,8 +10,11 @@ namespace engine_adapter {
 class EngineAdapterImpl : public EngineAdapter {
  public:
   enum class Direction { STOP, FORWARD, BACK };
-  EngineAdapterImpl();
+  enum class Position { LEFT, RIGHT };
+
+  EngineAdapterImpl(const Position pos);
   virtual ~EngineAdapterImpl();
+
   void SpinForward(const utils::UInt milliseconds) override;
   void SpinBack(const utils::UInt milliseconds) override;
   void SetAdapterSynchronizationBarrier(
@@ -29,5 +32,7 @@ class EngineAdapterImpl : public EngineAdapter {
   utils::synchronization::Atomic<Direction> current_state_;
   utils::synchronization::Atomic<utils::UInt> move_value_;
   utils::synchronization::Barrier* synchronization_barrier_;
+
+  const Position engine_position_;
 };
 }
