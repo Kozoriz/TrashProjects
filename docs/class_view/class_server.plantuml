@@ -1,0 +1,311 @@
+@startuml
+
+scale max 2700*2100
+skinparam linetype polyline
+
+' classes description
+
+package "Server Side" {
+class LifeCycle {
+ 
+  +void InitComponents()
+  +void DeinitComponents()
+  +void StartThreads()
+  +int ListenToClient()
+
+  +void OnDataMessageReceived(
+      const messages::SensorDataMessage& message) 
+  +void OnFinalMessageReceived() 
+
+ 
+  -utils::Profile* settings_
+
+  -drone_message_handler::DroneMessageHandler* message_handler_
+  -snapshot_processor::SnapshotProcessor* snapshot_processor_
+  -map_assembler::MapAssembler* map_assembler_
+  -map_detalization_analyzer::MapDetalizationAnalyzer* map_detalization_analyzer_
+  -guide::Guide* guide_
+  -drone_mover::DroneMover* drone_mover_
+}
+
+
+class MessageListener {
+ 
+  +{abstract} void OnDataMessageReceived(
+      const messages::SensorDataMessage& message) = 0
+  +{abstract} void OnFinalMessageReceived() = 0
+}
+
+
+
+class DroneMessageHandlerImpl {
+ 
+  +DroneMessageHandlerImpl(const utils::Profile& settings,
+                          MessageListener& message_listener)
+  +~DroneMessageHandlerImpl()
+  +void Run() 
+  +void Join() 
+  +void SendMessageToDroid(const messages::Message* message) 
+
+
+  +void set_socket(utils::SocketServer* socket)
+
+ 
+  -const utils::Profile& settings_
+  -MessageListener& message_listener_
+
+  -utils::SocketServer* socket_
+  -utils::MessageQueue<const messages::Message*> messages_to_client_
+  -utils::synchronization::Lock messages_lock_
+
+  -utils::synchronization::AtomicBool finalyzing_
+ }
+
+class DroneMoverImpl {
+ 
+  +DroneMoverImpl(const utils::Profile& settings)
+  +~DroneMoverImpl()
+
+  +utils::Vector<messages::MoveMessage*> MakeMoveCommadns(
+      const utils::positions::Location3& drone_dislocation,
+      const utils::Vector<utils::positions::Location3>& way_points) 
+
+ 
+  -const utils::Profile& settings_
+}
+
+class GuideImpl {
+ 
+  +GuideImpl(const utils::Profile& settings)
+  +~GuideImpl()
+
+  +const utils::positions::Location3& GetDroneLocation() 
+  +PointsArray GetWayPointsToNearestLocation(
+      const PointsArray& possible_analisation_points) 
+
+ 
+  -const utils::Profile& settings_
+  -utils::positions::Location3 current_dislocation_
+}
+
+class DroneMessageHandler {
+ 
+  +{abstract} void SendMessageToDroid(const messages::Message* message) = 0
+}
+
+class DroneMover {
+ 
+  +{abstract} utils::Vector<messages::MoveMessage*> MakeMoveCommadns(
+      const utils::positions::Location3& drone_dislocation,
+      const utils::Vector<utils::positions::Location3>& way_points) = 0
+}
+
+class Guide {
+ 
+  +{abstract} const utils::positions::Location3& GetDroneLocation() = 0
+  +{abstract} PointsArray GetWayPointsToNearestLocation(
+      const PointsArray& possible_analisation_points) = 0
+}
+
+
+class MapAssembler {
+ 
+  +{abstract} void AttachSnapshotToMap(
+      utils::SharedPtr<snapshot_processor::Snapshot> snapshot,
+      utils::positions::Location3 dislocation) = 0
+  +{abstract} const Map& GetActualMap() const = 0
+  +{abstract} void SaveMapFile() const = 0
+}
+
+
+class MapDetalizationAnalyzer {
+ 
+  +{abstract} PointsArray ProcessAnalisationPoints(
+      const map_assembler::Map& actual_map) = 0
+}
+
+
+class SnapshotProcessor {
+ 
+  +{abstract} SnapshotSPtr GetGeneratedSnapshot() const = 0
+  +{abstract} void OnMessageReceived(
+      const messages::SensorDataMessage& message) = 0
+  +{abstract} void ClearSnapshot() = 0
+  +{abstract} void SaveSnapshotFile() const = 0
+}
+
+class Map {
+ 
+  +void AddPoint(utils::positions::Location3& point)
+
+  +void ShiftMapToFirstQuadrant() 
+
+ 
+  -utils::classures::Matrix3 storage_
+}
+
+class MapAssemblerImpl {
+ 
+  +MapAssemblerImpl(const utils::Profile& settings)
+  +~MapAssemblerImpl()
+
+  +void AttachSnapshotToMap(
+      utils::SharedPtr<snapshot_processor::Snapshot> snapshot,
+      utils::positions::Location3 dislocation) 
+  +const Map& GetActualMap() const 
+  +void SaveMapFile() const 
+
+ 
+  
+  -void NormalizeGlobalMap()
+
+ 
+  -const utils::Profile& settings_
+  -Map storage_
+ }
+class MapDetalizationAnalyzerImpl {
+ 
+  +MapDetalizationAnalyzerImpl(const utils::Profile& settings)
+  +~MapDetalizationAnalyzerImpl()
+
+  +PointsArray ProcessAnalisationPoints(
+      const map_assembler::Map& actual_map) 
+
+ 
+  -const utils::Profile& settings_
+}
+
+
+class Snapshot {
+ 
+  +Snapshot()
+  +void AddPoint(const utils::positions::Location3& point)
+  +void Clear()
+  +const utils::classures::Matrix3& GetQuadrant(Octal octal)
+  +utils::positions::Location3 ShiftToOctal(
+      const utils::positions::Location3& point, Octal octal)
+
+ 
+  ' X>0 Y>0 Z>0
+  -QuadrantSPtr I_quadrant
+  ' X<0
+  -QuadrantSPtr II_quadrant
+  ' X<0 Y<0
+  -QuadrantSPtr III_quadrant
+  ' Y<0
+  -QuadrantSPtr IV_quadrant
+  ' Z<0 (under I)
+  -QuadrantSPtr V_quadrant
+  ' X<0 Z<0 (under II)
+  -QuadrantSPtr VI_quadrant
+  ' X<0 Y<0 Z<0 (under III)
+  -QuadrantSPtr VII_quadrant
+  ' Y<0 Z<0 (under IV)
+  -QuadrantSPtr VIII_quadrant
+}
+
+class SnapshotProcessorImpl {
+ 
+  +SnapshotProcessorImpl(const utils::Profile& settings)
+  +~SnapshotProcessorImpl()
+
+  +SnapshotSPtr GetGeneratedSnapshot() const 
+  +void OnMessageReceived(const messages::SensorDataMessage& message) 
+  +void ClearSnapshot() 
+  +void SaveSnapshotFile() const 
+
+ 
+  -const utils::Profile& settings_
+  -SnapshotSPtr snapshot_
+}
+
+package "Messages" {
+
+class Message {
+  
+ 
+  +Message(const MessageType type) 
+
+  +Message(const utils::ByteArray& raw_data)
+
+  +{abstract} const utils::ByteArray& ToRawData() const 
+
+  +MessageType type() 
+
+ 
+  #MessageType type_
+  #utils::ByteArray raw_data_array_
+ }
+
+
+class MoveMessage {
+ 
+  +MoveMessage()
+
+  +MoveMessage(const MoveType move_type, const utils::Int16 value)
+  +MoveMessage(const utils::ByteArray& raw_data) : messages::Message(raw_data) 
+ 
+
+ +MoveType move_type() const 
+  +utils::Int16 value() const 
+
+ 
+  #MoveType move_type_
+  
+  #utils::Int16 value_
+ }
+
+
+class SensorDataMessage {
+ 
+  +SensorDataMessage(const utils::UInt16 distance,
+                    const utils::positions::Incline& incline,
+                    const bool is_final = false)
+  +SensorDataMessage(const utils::ByteArray& raw_data)
+  +bool IsFinal() const 
+
+  +utils::UInt16 GetDistance() const
+
+  +const utils::positions::Incline& GetIncline() const 
+
+ 
+  #bool final_message_
+  #utils::UInt16 distance_
+  #utils::positions::Incline sensor_position_
+} 
+}
+}
+' relations
+
+MessageListener <|-- LifeCycle
+DroneMessageHandler o-- MessageListener
+
+LifeCycle *-- DroneMessageHandler
+LifeCycle *-down- SnapshotProcessor
+LifeCycle *-- MapAssembler
+LifeCycle *-- MapDetalizationAnalyzer
+LifeCycle *-- Guide
+LifeCycle *-- DroneMover
+
+
+DroneMessageHandler <|-- DroneMessageHandlerImpl
+SnapshotProcessor <|-- SnapshotProcessorImpl
+MapAssembler <|-- MapAssemblerImpl
+MapDetalizationAnalyzer <|-- MapDetalizationAnalyzerImpl
+Guide <|-- GuideImpl
+DroneMover <|-- DroneMoverImpl
+
+SnapshotProcessorImpl .. Snapshot : <using>
+MapAssemblerImpl .. Snapshot : <using>
+MapAssemblerImpl .. Map : <using>
+
+Message <|-- MoveMessage
+Message <|-- SensorDataMessage
+
+DroneMessageHandlerImpl .down.> Message : <using>
+SnapshotProcessorImpl .down.> SensorDataMessage : <using>
+DroneMoverImpl .down.> MoveMessage : <using>
+
+
+
+@enduml

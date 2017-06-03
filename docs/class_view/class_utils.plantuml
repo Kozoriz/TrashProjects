@@ -1,0 +1,429 @@
+@startuml
+
+scale 2970*2100
+
+
+' classes description
+
+
+package "Utils" {
+
+
+class MmapWorker {
+ 
+  +{static} MmapWorker* getInstance()
+  +void WriteNewStateToMap(const DroneAction act, const int32_t act_data)
+  +int32_t GetCurrentActData()
+  +DroneAction GetCurrentAct()
+
+ 
+  -MmapWorker()
+
+ 
+  -{static} MmapWorker* instance_
+
+  -class mmapData* mmapData_
+}
+
+class MessageQueue<?typename MessageType> {
+ 
+  +void PushMessage(const MessageType& message)
+  +MessageType GetMessage()
+  +void WaitNewMessages()
+  +bool IsFinalyzing() const
+  +void Finalyze()
+  +bool IsEmpty() const
+
+ + MessageQueue()
+  +~MessageQueue()
+
+  +size_t Size() const
+
+ 
+  -Queue<MessageType> queue_
+  -synchronization::Lock queue_lock_
+ - synchronization::Lock wait_lock_
+  -synchronization::ConditionalVariable new_messages_cond_var_
+  -synchronization::AtomicBool finalyzing_
+}
+
+
+class File {
+ 
+  +enum class OpenMode { None, Read, Write, Append }
+  +File(const String& name)
+
+  +void Open(const OpenMode mode)
+  +void Close()
+
+  +String ReadLine()
+  +void WriteLine(const String& string)
+  +bool IsOpened() const
+
+ 
+  -const String file_name_
+  -OpenMode mode_
+  -std::fstream std_file_stream_
+}
+
+  
+class LogLocation {
+  +LogLocation() 
+  +LogLocation(const char* file_name,
+              const char* function_name,
+              const unsigned long line_number)
+
+
+  +const char* file_name_
+  +const char* function_name_
+  +unsigned long line_number_
+}
+
+class Logger {
+ 
+  +{static} void InitLogger(const utils::String& log_file_name)
+  +{static} void DeinitLogger()
+  +{static} void PushLog(const logger::LoggerType& logger,
+                      const LogLevel level,
+                      const utils::String& entry,
+                      const LogLocation& location)
+
+ 
+  -Logger() = delete
+  -Logger(const Logger&) = delete
+  -Logger& operator=(const Logger&) = delete
+  -~Logger() = delete
+}
+
+class LoggerAutoPtr {
+ 
+  +LoggerAutoPtr()
+  +~LoggerAutoPtr()
+}
+
+class LogMessage {
+  +logger::LoggerType logger_
+  +logger::LogLevel level_
+  +utils::String entry_
+  +logger::LogLocation location_
+}
+
+ 
+class AutoTrace {
+ 
+  +AutoTrace(const LoggerType& logger, const LogLocation& location)
+      : logger_(logger), location_(location)
+
+  +~AutoTrace() 
+
+ 
+  -const LoggerType logger_
+  -const LogLocation location_
+ }
+
+class Socket {
+ 
+  +{abstract} void Send(const ByteArray& message) = 0
+  +{abstract} ByteArray Receive() = 0
+  +{abstract} void Init() = 0
+ 
+}
+class SocketClient {
+ }
+
+class SocketServer {
+ 
+  +{abstract} void AcceptClient() = 0
+ 
+}
+
+
+class TcpSocketClient {
+ 
+  +TcpSocketClient(const utils::String& address, const UInt port)
+  +~TcpSocketClient()
+  +void Send(const ByteArray& message) 
+  +ByteArray Receive() 
+  +void Init() 
+  +void Deinit()
+
+ 
+  -void EstabilishConnection()
+  -void OnConnetionEstablished(const boost::system::error_code& error)
+  -void OnMessageReceived(const boost::system::error_code& error)
+  -void SocketRead(const boost::system::error_code& error)
+  -void WritingTask(ByteArray message)
+  -void SocketWrite(const boost::system::error_code& error)
+
+ 
+  -const utils::String address_
+  -const utils::UInt port_
+  -ByteArray buffer_
+  -ClientMessageQueue messages_to_server_
+  -ClientMessageQueue messages_from_server_
+
+  -boost::asio::io_service boost_io_service_
+  -boost::asio::ip::tcp::socket boost_socket_
+  -UniquePtr<boost::thread> boost_thread_ptr_
+ 
+}
+
+
+class ClientSession {
+   
+    +ClientSession(BoostSocketSPtr socket)
+    +void WriteDataToSocket(const ByteArray& message)
+    +const ByteArray ReadDataFromSocket()
+    +void AllowTransmmitting(const bool is_accepted)
+
+   
+    -void SocketWriteTask(const boost::system::error_code& error)
+    -void SocketReadTask(const boost::system::error_code& error)
+
+   
+    -utils::SharedPtr<BoostSocket> socket_sptr_
+    -ByteArray buffer_
+    -ServerMessageQueue messages_to_client_
+    -ServerMessageQueue messages_from_client_
+
+    -synchronization::AtomicBool read_write_allowed_
+    -synchronization::AtomicBool reading_in_progress_
+  }
+
+class TcpSocketServer {
+ 
+  +TcpSocketServer(const utils::UInt16 port)
+  +~TcpSocketServer()
+ + void Send(const ByteArray& message) 
+  +ByteArray Receive() 
+  +void AcceptClient() 
+  +void Init() 
+
+ 
+  -void OnClientAccepted(const boost::system::error_code& error)
+
+ 
+ 
+  -const utils::UInt16 port_
+  -SharedPtr<ClientSession> client_
+
+  -boost::asio::io_service boost_io_service_
+  -boost::asio::ip::tcp::acceptor boost_acceptor_
+  -UniquePtr<boost::thread> boost_thread_ptr_
+}
+
+ 
+class Observer <?typename MessageType> {
+ 
+  +{abstract} void Handle(const MessageType& message) = 0
+}
+
+class Profile {
+ 
+  +{abstract} utils::UInt mover_adapters_count() const = 0
+  +{abstract} utils::Float engine_centimeters_per_second() const = 0
+  +{abstract} utils::Float engine_angle_per_second() const = 0
+  +{abstract} utils::UInt rotator_max_horyzontal() const = 0
+  +{abstract} utils::UInt rotator_max_vertical() const = 0
+  +{abstract} utils::UInt rotator_min_horyzontal() const = 0
+  +{abstract} utils::UInt rotator_min_vertical() const = 0
+  +{abstract} const utils::String& server_address() const = 0
+  +{abstract} utils::UInt server_port() const = 0
+}
+
+
+
+class ProfileImpl {
+ 
+  +ProfileImpl(const utils::String& file_name)
+  +utils::UInt mover_adapters_count() const 
+  +utils::Float engine_centimeters_per_second() const 
+  +utils::Float engine_angle_per_second() const 
+  +utils::UInt rotator_max_horyzontal() const 
+  +utils::UInt rotator_max_vertical() const 
+  +utils::UInt rotator_min_horyzontal() const 
+  +utils::UInt rotator_min_vertical() const 
+  +const utils::String& server_address() const 
+  +utils::UInt server_port() const 
+
+ 
+  +void ProcessIniFile(const String& ini_file)
+
+ 
+  +utils::UInt mover_adapters_count_
+  +utils::Float engine_centimeters_per_second_
+ + utils::Float engine_angle_per_second_
+  +utils::UInt rotator_max_horyzontal_
+  +utils::UInt rotator_max_vertical_
+  +utils::UInt rotator_min_horyzontal_
+  +utils::UInt rotator_min_vertical_
+  +utils::String server_address_
+  +utils::UInt server_port_
+}
+
+
+class Hash {
+ 
+  +size_t operator()(const positions::Location2& pos) const
+}
+
+
+class Matrix2 {
+ 
+  
+ +bool IsExists(const positions::Location2& pos) const
+  +bool IsExists(const UInt x, const UInt y) const
+
+  +void AddPoint(const positions::Location2& pos)
+  +void AddPoint(const UInt x, const UInt y)
+
+  +void RemovePoint(const positions::Location2& pos)
+  +void RemovePoint(const UInt x, const UInt y)
+
+  +const Matrix2& operator+=(const Matrix2& another_matrix)
+
+  +utils::UInt Size() const
+
+ 
+  -ContainerType storage_
+}
+
+  
+
+
+class Hash {
+ 
+  +size_t operator()(const positions::Location3& pos) const
+}
+
+class Matrix3 {
+ 
+  
+  +bool IsExists(const positions::Location3& pos) const
+  +bool IsExists(const UInt x, const UInt y, const UInt z) const
+
+  +void AddPoint(const positions::Location3& pos)
+  +void AddPoint(const UInt x, const UInt y, const UInt z)
+
+  +void RemovePoint(const positions::Location3& pos)
+  +void RemovePoint(const UInt x, const UInt y, const UInt z)
+
+  +Matrix3& operator+=(const Matrix3& another_matrix)
+  +Matrix3 operator+(const Matrix3& another_matrix)
+
+  +utils::UInt Size() const
+  +void Clear()
+
+  +ContainerType::const_iterator begin() const
+  +ContainerType::const_iterator end() const
+
+ 
+  -ContainerType storage_
+}
+
+
+class Incline {
+  +utils::Int16 alpha_ = 0
+  +utils::Int16 beta_ = 0
+}
+
+class Location2 {
+  +utils::Int x_ = 0
+  +utils::Int y_ = 0
+
+  +bool operator==(const Location2& other) const
+
+  }
+
+class Location3 {
+  +utils::Int x_ = 0
+  +utils::Int y_ = 0
+  +utils::Int z_ = 0
+
+  +bool operator==(const Location3& other) const 
+  +Location3 operator+(const Location3& other) const
+
+  +String ToString() const
+
+}
+
+
+class AutoLock {
+ 
+  +AutoLock(Lock& lock)
+  +~AutoLock()
+
+ 
+  -Lock& lock_
+}
+
+
+class Barrier {
+ 
+  +Barrier(const Int count)
+  +void set_count(const Int count)
+  +void Wait()
+
+ 
+  -Atomic<Int> count_
+  -Lock lock_
+  -ConditionalVariable cond_var_
+}
+
+
+class ConditionalVariable {
+ 
+
+  +void Wait(Lock& lock)
+  +ExitState WaitFor(Lock& lock, const utils::UInt milliseconds)
+  +void NotifyOne()
+  +void Broadcast()
+
+ 
+  -std::condition_variable std_cond_var_
+}
+
+
+class Lock {
+ 
+  +Lock()
+  +void Acquire()
+  +void Release()
+  +void Try()
+
+ 
+  -std::mutex std_mutex_
+  -friend class ConditionalVariable
+  
+}
+
+
+
+class Thread {
+ 
+
+  +Thread(ThreadRunnable& runnable)
+  +bool StartThread()
+  +void JoinThread()
+  +void ThreadMain()
+
+ 
+  -ThreadRunnable& runnable_
+  -utils::UniquePtr<std::thread> std_thread_unique_ptr_
+  -ThreadState current_state_
+}
+
+class ThreadRunnable {
+ 
+  +{abstract} void Run() = 0
+  +{abstract} void Join() = 0
+}
+
+}
+' relations
+
+
+
+
+
+@enduml

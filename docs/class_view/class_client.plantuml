@@ -1,0 +1,328 @@
+@startuml
+
+scale 2400*2000
+
+' classes description
+
+package "Client Side" {
+
+class AxelerometerAdapterImpl {
+ 
+  +{abstract} utils::positions::Incline GetData() const 
+}
+
+
+class EngineAdapterImpl {
+ 
+
+  +EngineAdapterImpl(const Position pos)
+  +{abstract} ~EngineAdapterImpl()
+
+  +void SpinForward(const utils::UInt milliseconds) 
+  +void SpinBack(const utils::UInt milliseconds) 
+  +void SetAdapterSynchronizationBarrier(
+      utils::synchronization::Barrier* barrier)
+  +void Run() 
+  +void Join() 
+
+ 
+  #void SpinForwardLowLevel(const utils::UInt milliseconds) const
+  #void SpinBackLowLevel(const utils::UInt milliseconds) const
+  #void OnSpinDone()
+
+ 
+  -utils::synchronization::AtomicBool finalyzing_
+  -utils::synchronization::Atomic<Direction> current_state_
+  -utils::synchronization::Atomic<utils::UInt> move_value_
+  -utils::synchronization::Barrier* synchronization_barrier_
+
+  -const Position engine_position_
+}
+
+
+
+class AxelerometerAdapter {
+ 
+  +{abstract} utils::positions::Incline GetData() const = 0
+}
+
+
+class EngineAdapter {
+ 
+  +{abstract} void SpinForward(const utils::UInt milliseconds) = 0
+  +{abstract} void SpinBack(const utils::UInt milliseconds) = 0
+  +{abstract} void SetAdapterSynchronizationBarrier(
+      utils::synchronization::Barrier* barrier) = 0
+}
+
+
+
+class Mover {
+ 
+  +{abstract} void OnMoveMessageReceived(const messages::MoveMessage& message) = 0
+
+ 
+  #MoveMessageQueue move_queue_
+  #utils::synchronization::Lock move_queue_lock_
+}
+
+
+class Scanner {
+ 
+  +{abstract} void OnScanningTriggered() = 0
+  +{abstract} void SetServerMessageHandler(
+      server_message_handler::ServerMessageHandler* message_handler) = 0
+}
+
+
+class SensorAdapter {
+ 
+  +{abstract} utils::Int GetSensorData() const = 0
+}
+
+
+class ServerMessageHandler {
+ 
+  +{abstract} void SendMessageToServer(const messages::Message* message) = 0
+}
+
+
+class ServoAdapter {
+ 
+  +{abstract} void ChangeAngle(const utils::Int angle_delta) = 0
+  +{abstract} void SetAngle(const utils::UInt new_angle) = 0
+}
+
+
+class TankTrackMover {
+ 
+  +TankTrackMover(engine_adapter::EngineAdapter& left,
+                 engine_adapter::EngineAdapter& right,
+                 const utils::Profile& settings)
+  +~TankTrackMover()
+  +void OnMoveMessageReceived(const messages::MoveMessage& message) 
+  +void Run() 
+  +void Join() 
+
+ 
+  #void Move(const utils::Int centimeters) const
+  #void Rotate(const utils::Int angle) const
+
+ 
+  -engine_adapter::EngineAdapter& left_track_adapter_
+  -engine_adapter::EngineAdapter& right_track_adapter_
+  -const utils::Profile& settings_
+  -utils::threads::Thread left_track_thread_
+  -utils::threads::Thread right_track_thread_
+  -utils::synchronization::AtomicBool finalizyng_
+  -utils::synchronization::Barrier adapters_waiting_barrier_
+}
+
+
+class ScannerImpl {
+ 
+  +ScannerImpl(
+      const sensor_adapter::SensorAdapter& sensor_adapter,
+      servo_adapter::ServoAdapter& x_servo_adapter,
+      servo_adapter::ServoAdapter& y_servo_adapter,
+      const axelerometer_adapter::AxelerometerAdapter& axelerometer_adapter,
+      const utils::Profile& settings)
+  +~ScannerImpl()
+  +void OnScanningTriggered() 
+  +void Run() 
+  +void Join() 
+  +void SetServerMessageHandler(
+      server_message_handler::ServerMessageHandler* message_handler) 
+
+ 
+  -messages::SensorDataMessage MakeServerMessage(
+      utils::UInt distance, utils::positions::Incline axelerometer_data)
+  -messages::SensorDataMessage MakeFinalMessage()
+  -void SendDataToServer(const messages::SensorDataMessage& message) const
+
+ 
+  -const sensor_adapter::SensorAdapter& sensor_
+  
+  -servo_adapter::ServoAdapter& x_rotator_
+  
+  -servo_adapter::ServoAdapter& y_rotator_
+  -const axelerometer_adapter::AxelerometerAdapter& axelerometer_adapter_
+
+  -server_message_handler::ServerMessageHandler* message_handler_
+
+  -utils::synchronization::AtomicBool is_scanning_allowed_
+  -utils::synchronization::AtomicBool finalyzing_
+
+  -utils::positions::Incline current_position_
+
+  -utils::synchronization::Lock finalyzing_lock_
+  -utils::synchronization::ConditionalVariable triggering_wait_cond_var_
+
+  -const utils::Profile& settings_
+}
+
+class LidarLite3Adapter {
+ 
+  +LidarLite3Adapter()
+  +utils::Int GetSensorData() const 
+}
+
+
+class ServerMessageHandlerImpl {
+ 
+  +ServerMessageHandlerImpl(mover::Mover& mover,
+                           scanner::Scanner& scanner,
+                           const utils::Profile& settings)
+  +{abstract} ~ServerMessageHandlerImpl()
+  +void SendMessageToServer(const messages::Message* message) 
+  +void Run() 
+  +void Join() 
+
+ 
+  -utils::Queue<const messages::Message*> messages_to_server_
+  -utils::synchronization::Lock messages_to_server_lock_
+
+  -mover::Mover& mover_
+  -scanner::Scanner& scanner_
+  ' TODO investigate testing without using of pointer
+  -utils::SocketClient* server_socket_connection_
+  -const utils::Profile& settings_
+
+  -utils::synchronization::Lock wait_lock_
+  -utils::synchronization::ConditionalVariable wait_cond_var_
+
+ 
+  +utils::UInt get_messages_to_server_size() const
+  +void set_socket(utils::SocketClient* new_socket)
+}
+
+class ServoAdapterImpl {
+ 
+
+  +ServoAdapterImpl(const Position pos)
+
+  +void ChangeAngle(const utils::Int angle_delta) 
+  +void SetAngle(const utils::UInt new_angle) 
+
+ 
+  -const Position position_
+ -utils::Int current_angle_
+}
+
+
+
+
+class LifeCycle {
+ 
+  +void InitComponents()
+  +void DeinitComponents()
+  +void StartThreads()
+  +int ListenToServer()
+
+ 
+  -utils::Profile* settings_
+
+  -server_message_handler::ServerMessageHandler* message_handler_
+
+  -mover::Mover* mover_
+  ' For tank tracks need only 2 engines
+  -engine_adapter::EngineAdapter* left_engine_
+  -engine_adapter::EngineAdapter* right_engine_
+
+  -scanner::Scanner* scanner_
+  -sensor_adapter::SensorAdapter* sensor_
+  ' Need 2 servo engines
+  -servo_adapter::ServoAdapter* x_servo_
+  -servo_adapter::ServoAdapter* y_servo_
+  -axelerometer_adapter::AxelerometerAdapter* axelerometer_
+
+  -utils::threads::Thread* message_handler_thread_
+  -utils::threads::Thread* mover_thread_
+  -utils::threads::Thread* scanner_thread_
+}
+}
+package "Messages" {
+
+class Message {
+  
+ 
+  +Message(const MessageType type) 
+
+  +Message(const utils::ByteArray& raw_data)
+
+  +{abstract} const utils::ByteArray& ToRawData() const 
+
+  +MessageType type() 
+
+ 
+  #MessageType type_
+  #utils::ByteArray raw_data_array_
+ }
+
+
+class MoveMessage {
+ 
+  +MoveMessage()
+
+  +MoveMessage(const MoveType move_type, const utils::Int16 value)
+  +MoveMessage(const utils::ByteArray& raw_data) : messages::Message(raw_data) 
+ 
+
+ +MoveType move_type() const 
+  +utils::Int16 value() const 
+
+ 
+  #MoveType move_type_
+  
+  #utils::Int16 value_
+ }
+
+
+class SensorDataMessage {
+ 
+  +SensorDataMessage(const utils::UInt16 distance,
+                    const utils::positions::Incline& incline,
+                    const bool is_final = false)
+  +SensorDataMessage(const utils::ByteArray& raw_data)
+  +bool IsFinal() const 
+
+  +utils::UInt16 GetDistance() const
+
+  +const utils::positions::Incline& GetIncline() const 
+
+ 
+  #bool final_message_
+  #utils::UInt16 distance_
+  #utils::positions::Incline sensor_position_
+} 
+
+
+}
+
+' relations
+
+Message <|-- MoveMessage
+Message <|-- SensorDataMessage
+
+ScannerImpl .down. SensorDataMessage : <using>
+TankTrackMover .down. MoveMessage : <using>
+ServerMessageHandlerImpl .down. Message : <using>
+
+LifeCycle *-- Scanner
+LifeCycle *-- Mover
+LifeCycle *-- SensorAdapter
+LifeCycle *-- ServoAdapter
+LifeCycle *-- AxelerometerAdapter
+LifeCycle *-- EngineAdapter
+LifeCycle *-down- ServerMessageHandler
+
+Scanner <|-- ScannerImpl
+Mover <|-- TankTrackMover
+SensorAdapter <|-- LidarLite3Adapter
+ServoAdapter <|-- ServoAdapterImpl
+AxelerometerAdapter <|-- AxelerometerAdapterImpl
+EngineAdapter <|-- EngineAdapterImpl
+ServerMessageHandler <|-- ServerMessageHandlerImpl
+
+
+@enduml
