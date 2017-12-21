@@ -9,19 +9,19 @@ if (EDISON_BUILD)
     /opt/poky-edison/1.7.3/sysroots/core2-32-poky-linux/usr/lib/libboost_system.so
     /opt/poky-edison/1.7.3/sysroots/core2-32-poky-linux/usr/lib/libboost_thread.so
     )
-  message(INFO ${Boost_LIBRARIES})
-
 endif()
-
 
 include_directories(
   ${3RD_PARTY_PATH}
   include
   ${GTEST_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIR}
 )
+set(BOOST_INCLUDE ${Boost_INCLUDE_DIR} PARENT_SCOPE)
+set(BOOST_LIBS ${Boost_LIBRARIES} PARENT_SCOPE)
 
 file(GLOB SOURCES
-	src/*.cc 
+  src/*.cc
   src/*/*.cc
   src/*/*/*.cc)
 

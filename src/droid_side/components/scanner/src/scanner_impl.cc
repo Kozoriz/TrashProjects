@@ -16,7 +16,6 @@ utils::positions::Incline operator+(const utils::positions::Incline& a,
   return result;
 }
 
-const utils::UInt servo_step = 1;
 const utils::UInt default_waiting_timeout = 100u;
 }
 
@@ -58,11 +57,11 @@ void scanner::ScannerImpl::Run() {
       x_rotator_.SetAngle(min_alpha);
       for (current_position_.alpha_ = min_alpha;
            current_position_.alpha_ <= max_alpha && !finalyzing_;
-           current_position_.alpha_ += servo_step) {
+           current_position_.alpha_ += settings_.rotator_step()) {
         y_rotator_.SetAngle(min_beta);
         for (current_position_.beta_ = min_beta;
              current_position_.beta_ <= max_beta && !finalyzing_;
-             current_position_.beta_ += servo_step) {
+             current_position_.beta_ += settings_.rotator_step()) {
           utils::UInt distance = sensor_.GetSensorData();
           utils::positions::Incline axelerometer_data =
               axelerometer_adapter_.GetData();
@@ -70,9 +69,9 @@ void scanner::ScannerImpl::Run() {
                                              << current_position_.beta_ << "="
                                              << distance);
           SendDataToServer(MakeServerMessage(distance, axelerometer_data));
-          y_rotator_.ChangeAngle(servo_step);
+          y_rotator_.ChangeAngle(settings_.rotator_step());
         }
-        x_rotator_.ChangeAngle(servo_step);
+        x_rotator_.ChangeAngle(settings_.rotator_step());
       }
       SendDataToServer(MakeFinalMessage());
       is_scanning_allowed_ = false;

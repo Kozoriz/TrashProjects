@@ -15,6 +15,7 @@ class ProfileImpl : public Profile {
   utils::UInt rotator_max_vertical() const override;
   utils::UInt rotator_min_horyzontal() const override;
   utils::UInt rotator_min_vertical() const override;
+  utils::UInt rotator_step() const override;
   const utils::String& server_address() const override;
   utils::UInt server_port() const override;
 
@@ -29,6 +30,7 @@ class ProfileImpl : public Profile {
   utils::UInt rotator_max_vertical_;
   utils::UInt rotator_min_horyzontal_;
   utils::UInt rotator_min_vertical_;
+  utils::UInt rotator_step_;
   utils::String server_address_;
   utils::UInt server_port_;
 };

@@ -34,6 +34,7 @@ set(LIBRARIES
 
 add_executable(${ClientExecutable} ${SOURCES})
 target_link_libraries (${ClientExecutable} ${LIBRARIES})
+target_link_libraries (${ClientExecutable} ${BOOST_LIBS})
 
 if(BUILD_TESTS)
     set(UNIT_TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/unit_tests)

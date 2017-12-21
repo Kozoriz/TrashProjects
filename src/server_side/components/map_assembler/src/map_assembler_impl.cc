@@ -1,6 +1,8 @@
 #include "map_assembler/map_assembler_impl.h"
 #include "utils/logger.h"
 #include "utils/containers/string.h"
+#include "utils/file_system.h"
+#include "utils/date_time.h"
 
 CREATE_LOGGER("MapAssembler")
 namespace map_assembler {
@@ -33,7 +35,21 @@ const Map& MapAssemblerImpl::GetActualMap() const {
   return storage_;
 }
 
-void MapAssemblerImpl::SaveMapFile() const {}
+void MapAssemblerImpl::SaveMapFile() const {
+    using namespace utils::file_system;
+    LOG_AUTO_TRACE();
+
+    const utils::String name =
+        utils::date_time::GetDateTimeString("Map_%Y_%m_%d_%I_%M_%S");
+    File file(name);
+    file.Open(File::OpenMode::Write);
+
+    for(auto point : storage_) {
+        file.WriteLine(point.ToString());
+    }
+
+    file.Close();
+}
 
 void MapAssemblerImpl::NormalizeGlobalMap() {
   LOG_AUTO_TRACE();

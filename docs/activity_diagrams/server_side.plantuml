@@ -1,0 +1,35 @@
+@startuml
+start 
+
+:start components and threads;
+:bind TCP soket port;
+
+repeat
+:wait for client;
+repeat while (client connected?)
+
+:accept client; 
+:send start scanning message;
+
+repeat 
+:wait messages;
+:receve message;
+:detect message type;
+
+if (message_type == SensorData) then (yes)
+:convert data from Spheric system to Decart system;
+:save coordinate to current snapshot;
+else if (message_type == FinalData) then (yes) 
+:save snapshot to file;
+:concantenate snapshot with global map;
+:analyze snapshot for possible points of analysis; 
+:generate waytpoints to one of point;
+:generate move comands; 
+:send commands to client;
+:send start scanning message;
+:clear current snapshot;
+endif 
+repeat while (true)
+
+stop 
+@enduml

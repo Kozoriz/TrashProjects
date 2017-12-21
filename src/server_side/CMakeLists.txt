@@ -27,6 +27,7 @@ set(LIBRARIES
     MapAssembler
     MapDetalizationAnalyzer
     SnapshotProcessor
+    ${BOOST_LIBS}
 )
 
 add_executable(${ServerExecutable} ${SOURCES})

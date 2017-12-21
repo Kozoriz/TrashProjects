@@ -90,8 +90,8 @@ void LifeCycle::OnFinalMessageReceived() {
     message_handler_->SendMessageToDroid(message);
   }
 
-  message_handler_->SendMessageToDroid(
-      new messages::Message(messages::MessageType::START_SCAN));
+//  message_handler_->SendMessageToDroid(
+//      new messages::Message(messages::MessageType::START_SCAN));
 
   // Clear snapshot in the end
   snapshot_processor_->ClearSnapshot();

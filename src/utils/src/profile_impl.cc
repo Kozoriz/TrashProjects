@@ -46,6 +46,7 @@ ProfileImpl::ProfileImpl(const String& file_name)
     , rotator_max_vertical_(0u)
     , rotator_min_horyzontal_(0u)
     , rotator_min_vertical_(0u)
+    , rotator_step_(1u)
     , server_address_("")
     , server_port_(0u) {
   LOG_AUTO_TRACE();
@@ -77,7 +78,12 @@ UInt ProfileImpl::rotator_min_horyzontal() const {
 }
 
 UInt ProfileImpl::rotator_min_vertical() const {
-  return rotator_min_vertical_;
+    return rotator_min_vertical_;
+}
+
+UInt ProfileImpl::rotator_step() const
+{
+    return rotator_step_;
 }
 
 const String& ProfileImpl::server_address() const {
@@ -115,6 +121,7 @@ void ProfileImpl::ProcessIniFile(const String& ini_file) {
             rotator_min_horyzontal_);
   addOption(
       options_description, "Servo.RotatorMinVertical", rotator_min_vertical_);
+  addOption(options_description, "Servo.Step", rotator_step_);
   addOption(options_description, "TCP.ServerAddress", server_address_);
   addOption(options_description, "TCP.ServerPort", server_port_);
 

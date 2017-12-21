@@ -1,0 +1,55 @@
+@startuml
+|Binary executable|
+start
+:initiate components and threads;
+:start TCP socket listening;
+
+repeat 
+:wait for message;
+:receive message from TCP;
+
+if (message_type == Move) then (yes) 
+:check move type;
+if (move_type == Rotate) then (yes) 
+:trigger __one__ engin on arduino board;
+else if (move_type == Rotate) then (yes) 
+:trigger __two__ engines on arduino board;
+endif 
+:set mmap variables to correct value;
+:trigger conditional variable;
+|#AntiqueWhite|Arduino sketch|
+:read variable value (ms);
+:run engines for set value of time;
+|Binary executable|
+:continue;
+else if (message_type == StartScan) then (yes) 
+
+:set vertical servo to correct angle;
+:set horyzontal servo to correct angle;
+
+:trigger scanning on arduino board;
+:set mmap variables to correct value;
+:trigger conditional variable;
+
+|Arduino sketch|
+:read variable value (type);
+:read data from sensor;
+:write data to variable (sentimeters);
+
+
+|Binary executable|
+:read data from mmap variable;
+
+:create data message;
+:send message via TCP;
+
+
+else if (message_type == EndProgram) then (yes) 
+:stop lifecycle;
+stop
+endif 
+
+repeat while (true)
+
+stop
+@enduml
