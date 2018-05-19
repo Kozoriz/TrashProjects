@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class YoutubedownloaderConfig(AppConfig):
-    name = 'YoutubeDownloader'
+    name = 'Django_labs.apps.YoutubeDownloader'

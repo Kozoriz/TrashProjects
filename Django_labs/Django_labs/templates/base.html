@@ -1,0 +1,40 @@
+{% load static %}
+
+<!doctype html>
+<html lang=''>
+<head>
+   <meta charset='utf-8'>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% block title %}
+    <title>Default title</title>
+    {% endblock %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}" />
+    {% block css %}
+    {% endblock %}
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    {% block js %}
+    {% endblock %}
+</head>
+<body>
+
+{% block header %}
+<div class='nav_menu'>
+<ul class='nav'>
+   <li class='nav_home nav_active'><a href='/'>Home</a></li>
+   <li class='nav_youtube'><a href='/youtube/'>Youtube Downloader</a></li>
+</ul>
+</div>
+{% endblock %}
+
+{% block body %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+</body>
+<html>

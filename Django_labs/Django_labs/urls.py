@@ -16,13 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from django.conf import settings
-from django.conf.urls.static import static
-
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.index, name='home'),
     path('admin/', admin.site.urls),
-    path('youtube/', include("YoutubeDownloader.urls")),
+    path('youtube/', include("Django_labs.apps.YoutubeDownloader.urls")),
 ]

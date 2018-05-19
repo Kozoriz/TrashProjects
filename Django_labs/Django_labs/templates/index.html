@@ -1,23 +1,9 @@
-{% load static %}
+{% extends "base.html" %}
 
-<!doctype html>
-<html lang=''>
-<head>
-   <meta charset='utf-8'>
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1">
-   <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}" />
-   <title>CSS MenuMaker</title>
-</head>
-<body>
+{% block title %}
+    <title>Home page</title>
+{% endblock %}
 
-<div id='cssmenu'>
-<ul>
-   <li class='active'><a href=''>Home</a></li>
-</ul>
-</div>
-
+{% block body %}
 <p>Hello, you are on home page. Try to choose one of tabs to use applications.</p>
-
-</body>
-<html>
+{% endblock %}
