@@ -5,5 +5,9 @@
 {% endblock %}
 
 {% block body %}
- YOUTUBE
+<form action="./loaded_files/" method="post"  enctype="multipart/form-data" class="basic-grey">{% csrf_token %}
+    <p>Be careful with it. You will not stop downloading. (server stop needed)</p>
+    {{  form.as_table }}
+    <input type="submit" class="form_submit button" title="Download"/>
+</form>
 {% endblock %}
