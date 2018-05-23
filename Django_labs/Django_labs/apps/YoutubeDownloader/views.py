@@ -46,9 +46,12 @@ def downloaded_page(request):
         for playlist in playlist_urls:
             pl = Playlist(url=playlist)
             pl_dir = directory + playlist.split("list=")[1] + "\\"
+
             if not os.path.exists(pl_dir):
                 os.makedirs(pl_dir)
-            pl.download_all(download_path=pl_dir)
+
+            pl.populate_video_urls()
+            download_urls(pl.video_urls, pl_dir)
     except:
         pass
 
@@ -77,7 +80,9 @@ def download_urls(urls, directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
+    video_infos = []
     for url in urls:
+        video_infos.append(get_video_info_data(url))
         yt = YouTube(url=url)
         yt.streams \
             .filter(progressive=True, file_extension='mp4') \
@@ -85,3 +90,8 @@ def download_urls(urls, directory):
             .desc() \
             .first() \
             .download(directory)
+
+
+def get_video_info_data(url):
+    info_data = {}
+
