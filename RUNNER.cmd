@@ -1,0 +1,1 @@
+Django_labs\venv\Scripts\python.exe Django_labs\manage.py runserver
