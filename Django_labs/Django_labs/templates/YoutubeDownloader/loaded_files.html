@@ -2,4 +2,41 @@
 
 {% block body %}
     <p>Check this directory for updates : {{ data }} </p>
+
+    <table class="loaded_data">
+        <tr>
+            <td>Url</td>
+            <td>Name</td>
+            <td>Bytes remaining</td>
+        </tr>
+    </table>
+
+    <script>
+
+    function make_table_content(json_data)
+    {
+        $('.loaded_data tr').not(':first').remove();
+        var html = '';
+        for(var i = 0; i < json_data.length; ++i)
+                    html += '<tr>' +
+                            '<td>' + json_data[i]['url'] + '</td>' +
+                            '<td>' + json_data[i]['name'] + '</td>' +
+                            '<td>' + json_data[i]['bytes_remaining'] + '</td>' +
+                            '</tr>';
+        $('.loaded_data tr').first().after(html);
+    }
+
+    var InfiniteAjaxRequest = function (uri) {
+        $.ajax({
+            url: uri,
+            success: function(data) {
+                make_table_content(data);
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+            }
+        });
+    };
+setInterval(InfiniteAjaxRequest, 1000, "check_loaded_state/");
+</script>
 {% endblock %}
+
