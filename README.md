@@ -14,5 +14,5 @@
 -- in case directori not exists, its will be created
 - second field is for direct video links (format : https://www.youtube.com/watch?v=<video_key>)
 - third field for playlists links (format : https://www.youtube.com/playlist?list=<list_key>)
-- fourth field for account page links (format : https://www.youtube.com/user/<username>)
+- fourth field for account page links (format : https://www.youtube.com/user/<user_name>)
 ### PLEASE, ALWAYS USE ACCORDING TO FORMATS
