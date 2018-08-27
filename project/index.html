@@ -14,15 +14,16 @@
 
     <base target="_blank">
 
-    <title>Transfer a file</title>
+    <title>RTC practice</title>
 
-    <link href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="css/main.css">
 
 </head>
 
 <body>
 
+
+<div class="dragndropsection">
     <div id="container">
 
 
@@ -50,8 +51,29 @@
 
     </div>
 
+</div>
+
+<div class="video_section">
+    <div class="video_source_section">
+        <p>Source : </p>
+        <video class="video_window" id="video1" autoplay></video>
+        <input type="button" name="start_source_button" id="start_source_button" value="Start" />
+        <input type="button" name="stop_source_button" id="stop_source_button" value="Stop" />
+    </div>
+    <div class="video_peers_section">
+        <p>Peers : </p>
+        <video class="video_window" id="video2" autoplay></video>
+        <input type="text" name="source_address" id="source_address" value="localhost" />
+        <input type="button" name="peer_connect" id="peer_connect" value="Connect to active stream" />
+        <input type="button" name="disconnect_all" id="disconnect_all" value="Stop all" />
+    </div>
+</div>
+
+
+
     <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/video_streams.js"></script>
 
 </body>
 </html>
